@@ -1,0 +1,15 @@
+import streamlit as st
+
+st.set_page_config(page_title="Finance Suite", layout="wide")
+
+st.title("💼 Finance Suite")
+st.markdown("""
+Καλώς ήρθες στο προσωπικό σου Finance Hub.
+
+### Διαθέσιμα εργαλεία:
+✅ Bond Calculator Pro  
+✅ Leasing Buyout Analyzer  
+✅ Leasing vs Buy (με Δάνειο)
+
+➡️ Επίλεξε εργαλείο από το menu αριστερά.
+""")

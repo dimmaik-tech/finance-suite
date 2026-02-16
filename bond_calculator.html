@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📊 Υπολογιστής Ομολόγων Pro</title>
+    
+    <!-- Favicon με emoji -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📊</text></svg>">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body { 
+            font-family: 'Segoe UI', Arial; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container { 
+            max-width: 1000px; 
+            margin: 0 auto; 
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            color: white;
+        }
+
+        .logo {
+            font-size: 4rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .subtitle { 
+            font-size: 1.1rem; 
+            opacity: 0.9; 
+        }
+
+        .card { 
+            background: white; 
+            border-radius: 16px; 
+            padding: 30px; 
+            margin: 20px 0;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        .card h2 { 
+            color: #1a237e; 
+            border-bottom: 3px solid #667eea; 
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .form-row { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
+            gap: 20px; 
+            margin-bottom: 20px;
+        }
+
+        label { 
+            display: block; 
+            margin-bottom: 8px; 
+            font-weight: 600; 
+            color: #37474f; 
+        }
+
+        input, select { 
+            width: 100%; 
+            padding: 12px 15px; 
+            border: 2px solid #e0e0e0; 
+            border-radius: 8px; 
+            font-size: 16px;
+            font-family: 'Courier New', monospace;
+            transition: all 0.3s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        button { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; 
+            border: none; 
+            padding: 15px 50px; 
+            font-size: 18px; 
+            font-weight: 600;
+            border-radius: 8px; 
+            cursor: pointer;
+            display: block;
+            margin: 30px auto;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        .results { display: none; }
+        .results.show { display: block; }
+
+        .result-row { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            padding: 15px; 
+            background: #f5f7fa; 
+            margin: 10px 0;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .result-row.highlight {
+            background: linear-gradient(135deg, #e8eaf6 0%, #c5cae9 100%);
+            border-left: 4px solid #ff6f00;
+        }
+
+        .result-row.total {
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            border-left: 4px solid #28a745;
+            font-weight: bold;
+        }
+
+        .result-label { font-weight: 600; color: #37474f; }
+
+        .result-value { 
+            font-weight: 700; 
+            color: #1a237e; 
+            font-family: 'Courier New', monospace;
+            font-size: 1.2rem;
+        }
+
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin-top: 15px; 
+            font-size: 0.95rem;
+        }
+
+        th { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+            color: white; 
+            padding: 12px; 
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td { 
+            padding: 12px; 
+            border-bottom: 1px solid #e0e0e0; 
+        }
+
+        tr:hover { background: #f5f7fa; }
+
+        .verification {
+            background: #e8f5e9;
+            border-left: 4px solid #4caf50;
+            padding: 15px;
+            border-radius: 0 8px 8px 0;
+            margin-top: 20px;
+        }
+
+        .btn-export {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            margin-top: 20px;
+        }
+
+        .info {
+            background: #e3f2fd;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 20px;
+        }
+
+        .summary-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 20px;
+            border-radius: 0 8px 8px 0;
+            margin: 20px 0;
+        }
+
+        .summary-box h3 {
+            color: #856404;
+            margin-bottom: 15px;
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 1.8rem; }
+            .logo { font-size: 3rem; }
+            .form-row { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">📊</div>
+            <h1>Υπολογιστής Ομολόγων Pro</h1>
+            <p class="subtitle">Υπολογίστε YTM, προπληρωμένο κουπόνι και ταμειακές ροές</p>
+        </header>
+        
+        <div class="info">
+            💡 Πληκτρολογήστε τους αριθμούς και θα μορφοποιηθούν αυτόματα (π.χ. 4000000 → 4.000.000,00)
+        </div>
+
+        <div class="card">
+            <h2>📋 Στοιχεία Ομολόγου</h2>
+            <div class="form-row">
+                <div>
+                    <label>Nominal Value / Ονομαστική Αξία *</label>
+                    <input type="text" id="fv" class="num-input" placeholder="4.000.000,00">
+                </div>
+                <div>
+                    <label>Market Value / Clean Price *</label>
+                    <input type="text" id="mv" class="num-input" placeholder="3.991.320,00">
+                </div>
+                <div>
+                    <label>Coupon Rate (%) / Επιτόκιο Κουπονιού (%) *</label>
+                    <input type="text" id="cr" placeholder="5,033302">
+                </div>
+            </div>
+            <div class="form-row">
+                <div>
+                    <label>Issue Day / Ημερομηνία Έκδοσης *</label>
+                    <input type="date" id="id">
+                </div>
+                <div>
+                    <label>Value Day / Ημερομηνία Αγοράς *</label>
+                    <input type="date" id="vd">
+                </div>
+                <div>
+                    <label>Maturity Day / Ημερομηνία Λήξης *</label>
+                    <input type="date" id="md">
+                </div>
+            </div>
+            <div class="form-row">
+                <div>
+                    <label>Συχνότητα Πληρωμών / Payment Frequency *</label>
+                    <select id="fr">
+                        <option value="12">Ετήσια (12 μήνες)</option>
+                        <option value="6">Εξαμηνιαία (6 μήνες)</option>
+                        <option value="4">Τετραμηνιαία (4 μήνες)</option>
+                        <option value="3">Τριμηνιαία (3 μήνες)</option>
+                        <option value="1">Μηνιαία (1 μήνα)</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Βάση Υπολογισμού Ημερών / Day Count Basis *</label>
+                    <select id="db">
+                        <option value="365">365</option>
+                        <option value="360">360</option>
+                    </select>
+                </div>
+            </div>
+            <button onclick="calculate()">🔍 Υπολογισμός</button>
+        </div>
+
+        <div id="res" class="card results">
+            <h2>📈 Αποτελέσματα</h2>
+            
+            <div class="result-row highlight">
+                <span class="result-label">YTM (Yield to Maturity)</span>
+                <span id="r-ytm" class="result-value">-</span>
+            </div>
+            <div class="result-row">
+                <span class="result-label">Προπληρωμένο Κουπόνι / Accrued interest </span>
+                <span id="r-acc" class="result-value">-</span>
+            </div>
+            <div class="result-row">
+                <span class="result-label">Μικτή Τιμή (Dirty Price) / Dirty Price </span>
+                <span id="r-dirty" class="result-value">-</span>
+            </div>
+            <div class="result-row">
+                <span class="result-label">Ημέρες Accrued / Accrued Days </span>
+                <span id="r-days" class="result-value">-</span>
+            </div>
+            <div class="result-row">
+                <span class="result-label">Ετήσιο Κουπόνι / Annual Coupon </span>
+                <span id="r-ann" class="result-value">-</span>
+            </div>
+            <!-- ΝΕΟ: Διάρκεια ομολόγου -->
+            <div class="result-row">
+                <span class="result-label">Διάρκεια Ομολόγου (Αγορά → Λήξη) / Bond Duration </span>
+                <span id="r-duration" class="result-value">-</span>
+            </div>
+
+            <!-- ΣΥΝΟΛΑ -->
+            <div class="summary-box">
+                <h3>📊 Συνολικές Ταμειακές Ροές</h3>
+                <div class="result-row">
+                    <span class="result-label">Σύνολο Κουπονιών / Total Coupons </span>
+                    <span id="r-tot-coup" class="result-value">-</span>
+                </div>
+                <div class="result-row">
+                    <span class="result-label">Κεφάλαιο Λήξης / Principal Repayment </span>
+                    <span id="r-cap" class="result-value">-</span>
+                </div>
+                <div class="result-row total">
+                    <span class="result-label">ΣΥΝΟΛΙΚΕΣ ΕΙΣΠΡΑΞΕΙΣ / Total Cash Flows </span>
+                    <span id="r-tot-all" class="result-value">-</span>
+                </div>
+                <div class="result-row">
+                    <span class="result-label">Μικτή Τιμή (Κόστος Αγοράς)</span>
+                    <span id="r-dirty-cost" class="result-value">-</span>
+                </div>
+                <div class="result-row total">
+                    <span class="result-label">Κέρδος / Ζημία στη Λήξη/ Profit/Loss at Maturity </span>
+                    <span id="r-profit" class="result-value">-</span>
+                </div>
+            </div>
+
+            <h3 style="margin-top: 25px; color: #37474f;">💰 Αναλυτικές Ταμειακές Ροές</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Περίοδος</th>
+                        <th>Ημερομηνία</th>
+                        <th>Ημέρες</th>
+                        <th>Κουπόνι (€)</th>
+                        <th>Κεφάλαιο (€)</th>
+                        <th>Σύνολο (€)</th>
+                    </tr>
+                </thead>
+                <tbody id="tb"></tbody>
+            </table>
+
+            <div class="verification">
+                <strong>✓ Επαλήθευση:</strong> Υπολογισμένη Παρούσα Αξία = <span id="r-pv">-</span>
+                <br>Διαφορά από Market Value: <span id="r-diff">-</span>
+            </div>
+
+            <button class="btn-export" onclick="exportTXT()">📄 Εξαγωγή TXT</button>
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // ΕΛΛΗΝΙΚΗ ΜΟΡΦΟΠΟΙΗΣΗ
+        // ============================================
+
+        function fmt(num) {
+            let n = Number(num);
+            if (isNaN(n)) return '0,00';
+            let str = n.toFixed(2);
+            let parts = str.split('.');
+            let intPart = parts[0];
+            let decPart = parts[1];
+            let res = '';
+            let cnt = 0;
+            for (let i = intPart.length - 1; i >= 0; i--) {
+                res = intPart[i] + res;
+                cnt++;
+                if (cnt === 3 && i > 0) {
+                    res = '.' + res;
+                    cnt = 0;
+                }
+            }
+            return res + ',' + decPart;
+        }
+
+        function fmtDate(d) {
+            if (typeof d === 'string') d = new Date(d);
+            if (!d || isNaN(d.getTime())) return '';
+            return String(d.getDate()).padStart(2, '0') + '/' + 
+                   String(d.getMonth() + 1).padStart(2, '0') + '/' + 
+                   d.getFullYear();
+        }
+
+        function par(str) {
+            if (!str) return 0;
+            return parseFloat(str.replace(/\./g, '').replace(',', '.'));
+        }
+
+        function days(s, e) {
+            return Math.round((e - s) / (24 * 60 * 60 * 1000));
+        }
+
+        // ΝΕΟ: Υπολογισμός διάρκειας σε χρόνια
+        function calcDurationYears(start, end) {
+            let d1 = new Date(start);
+            let d2 = new Date(end);
+            
+            let years = d2.getFullYear() - d1.getFullYear();
+            let months = d2.getMonth() - d1.getMonth();
+            let days = d2.getDate() - d1.getDate();
+            
+            // Διόρθωση αν οι μέρες είναι αρνητικές
+            if (days < 0) {
+                months--;
+                // Προσθήκη ημερών του προηγούμενου μήνα
+                let prevMonth = new Date(d2.getFullYear(), d2.getMonth(), 0);
+                days += prevMonth.getDate();
+            }
+            
+            // Διόρθωση αν οι μήνες είναι αρνητικοί
+            if (months < 0) {
+                years--;
+                months += 12;
+            }
+            
+            // Υπολογισμός κλασματικών ετών
+            let fractionalYears = years + (months / 12) + (days / 365.25);
+            
+            return {
+                years: years,
+                months: months,
+                days: days,
+                totalYears: fractionalYears
+            };
+        }
+
+        // AUTO-FORMATTING για αριθμούς (εκτός από επιτόκιο)
+        document.getElementById('fv').addEventListener('blur', function() {
+            let val = this.value.trim().replace(/\s/g, '');
+            if (val) {
+                let clean = val.replace(/\./g, '').replace(',', '.');
+                let num = parseFloat(clean);
+                if (!isNaN(num) && num !== 0) {
+                    this.value = fmt(num);
+                }
+            }
+        });
+        
+        document.getElementById('mv').addEventListener('blur', function() {
+            let val = this.value.trim().replace(/\s/g, '');
+            if (val) {
+                let clean = val.replace(/\./g, '').replace(',', '.');
+                let num = parseFloat(clean);
+                if (!isNaN(num) && num !== 0) {
+                    this.value = fmt(num);
+                }
+            }
+        });
+
+        // Υπολογισμός κουπονιών από λήξη
+        function getCoupons(issue, maturity, freq) {
+            let coupons = [];
+            let cur = new Date(maturity);
+            while (cur > issue) {
+                coupons.unshift(new Date(cur));
+                cur.setMonth(cur.getMonth() - freq);
+            }
+            return coupons;
+        }
+
+        // Newton-Raphson για YTM
+        function calcYTM(price, face, couponPay, periods, periodsPerYear, firstFrac) {
+            let r = 0.05 / periodsPerYear;
+            for (let i = 0; i < 100; i++) {
+                let pvCoupons = 0;
+                for (let t = 1; t <= periods; t++) {
+                    pvCoupons += couponPay / Math.pow(1 + r, t - 1 + firstFrac);
+                }
+                let pvFace = face / Math.pow(1 + r, periods - 1 + firstFrac);
+                let f = pvCoupons + pvFace - price;
+                
+                let df = 0;
+                for (let t = 1; t <= periods; t++) {
+                    df -= (t - 1 + firstFrac) * couponPay / Math.pow(1 + r, t + firstFrac);
+                }
+                df -= (periods - 1 + firstFrac) * face / Math.pow(1 + r, periods + firstFrac);
+                
+                if (Math.abs(df) < 1e-10) break;
+                let rNew = r - f / df;
+                if (Math.abs(rNew - r) < 1e-10) {
+                    r = rNew;
+                    break;
+                }
+                r = rNew;
+                if (r < -0.99) r = -0.99;
+            }
+            return r * periodsPerYear * 100;
+        }
+
+        let lastCalc = null;
+
+        function calculate() {
+            try {
+                // Διάβασε inputs
+                let fv = par(document.getElementById('fv').value);
+                let mv = par(document.getElementById('mv').value);
+                let crStr = document.getElementById('cr').value.trim();
+                let cr = parseFloat(crStr.replace(',', '.'));
+                
+                let id = new Date(document.getElementById('id').value);
+                let vd = new Date(document.getElementById('vd').value);
+                let md = new Date(document.getElementById('md').value);
+                let fr = parseInt(document.getElementById('fr').value);
+                let db = parseInt(document.getElementById('db').value);
+
+                // Validation
+                if (isNaN(id.getTime()) || isNaN(vd.getTime()) || isNaN(md.getTime())) {
+                    alert('Συμπληρώστε όλες τις ημερομηνίες!');
+                    return;
+                }
+                if (md <= id) {
+                    alert('Η λήξη πρέπει να είναι μετά την έκδοση!');
+                    return;
+                }
+                if (vd < id || vd > md) {
+                    alert('Η αγορά πρέπει να είναι μεταξύ έκδοσης και λήξης!');
+                    return;
+                }
+
+                // ΝΕΟ: Υπολογισμός διάρκειας
+                let duration = calcDurationYears(vd, md);
+
+                // Υπολογισμός κουπονιών
+                let allCoupons = getCoupons(id, md, fr);
+                let lastC = id;
+                let future = [];
+                
+                for (let d of allCoupons) {
+                    if (d <= vd) lastC = d;
+                    else future.push(d);
+                }
+
+                if (future.length === 0) {
+                    alert('Δεν βρέθηκαν μελλοντικά κουπόνια!');
+                    return;
+                }
+
+                // Βασικοί υπολογισμοί
+                let ppy = 12 / fr;
+                let ann = fv * (cr / 100);
+                let cp = ann / ppy;
+                let accDays = days(lastC, vd);
+                let acc = ann * accDays / db;
+                let dirty = mv + acc;
+                
+                let nextC = future[0];
+                let daysToNext = days(vd, nextC);
+                let daysFull = days(lastC, nextC);
+                if (daysFull === 0) daysFull = db / ppy;
+                let frac = daysToNext / daysFull;
+                
+                let ytm = calcYTM(mv, fv, cp, future.length, ppy, frac);
+
+                // Υπολογισμός ΣΥΝΟΛΩΝ
+                let totalCoupons = cp * future.length;
+                let totalCashFlows = totalCoupons + fv;
+                let profitLoss = totalCashFlows - dirty;
+
+                lastCalc = {
+                    fv, mv, cr, id, vd, md, fr, db, ytm, acc, dirty, accDays,
+                    ann, future, cp, daysToNext, daysFull, lastC, nextC,
+                    totalCoupons, totalCashFlows, profitLoss, duration
+                };
+
+                // Εμφάνιση βασικών αποτελεσμάτων
+                document.getElementById('r-ytm').textContent = ytm.toFixed(4) + '%';
+                document.getElementById('r-acc').textContent = '€' + fmt(acc);
+                document.getElementById('r-dirty').textContent = '€' + fmt(dirty);
+                document.getElementById('r-days').textContent = accDays + ' ημέρες';
+                document.getElementById('r-ann').textContent = '€' + fmt(ann);
+                
+                // ΝΕΟ: Εμφάνιση διάρκειας
+                let durationText = duration.years + ' έτη, ' + duration.months + ' μήνες, ' + duration.days + ' ημέρες';
+                durationText += ' (' + duration.totalYears.toFixed(2) + ' χρόνια)';
+                document.getElementById('r-duration').textContent = durationText;
+
+                // Εμφάνιση ΣΥΝΟΛΩΝ
+                document.getElementById('r-tot-coup').textContent = '€' + fmt(totalCoupons);
+                document.getElementById('r-cap').textContent = '€' + fmt(fv);
+                document.getElementById('r-tot-all').textContent = '€' + fmt(totalCashFlows);
+                document.getElementById('r-dirty-cost').textContent = '€' + fmt(dirty);
+                
+                let profitElem = document.getElementById('r-profit');
+                profitElem.textContent = (profitLoss >= 0 ? '+' : '') + '€' + fmt(profitLoss);
+                profitElem.style.color = profitLoss >= 0 ? '#28a745' : '#dc3545';
+
+                // Πίνακας αναλυτικών ταμειακών ροών
+                let tb = document.getElementById('tb');
+                tb.innerHTML = '';
+                let prev = vd;
+
+                for (let i = 0; i < future.length; i++) {
+                    let d = future[i];
+                    let ds = days(prev, d);
+                    let isLast = i === future.length - 1;
+                    let pr = isLast ? fv : 0;
+                    let tot = cp + pr;
+
+                    let row = tb.insertRow();
+                    row.innerHTML = '<td>' + (i+1) + '</td>' +
+                                    '<td>' + fmtDate(d) + '</td>' +
+                                    '<td>' + ds + '</td>' +
+                                    '<td>€' + fmt(cp) + '</td>' +
+                                    '<td>€' + fmt(pr) + '</td>' +
+                                    '<td>€' + fmt(tot) + '</td>';
+                    prev = d;
+                }
+
+                // Επαλήθευση
+                let r = ytm / 100 / ppy;
+                let pv = 0;
+                for (let i = 0; i < future.length; i++) {
+                    let cf = i === future.length - 1 ? cp + fv : cp;
+                    pv += cf / Math.pow(1 + r, i + frac);
+                }
+                document.getElementById('r-pv').textContent = '€' + fmt(pv);
+                document.getElementById('r-diff').textContent = '€' + fmt(Math.abs(pv - mv));
+
+                document.getElementById('res').classList.add('show');
+                document.getElementById('res').scrollIntoView({ behavior: 'smooth' });
+
+            } catch (e) {
+                alert('Σφάλμα: ' + e.message);
+                console.error(e);
+            }
+        }
+
+        function exportTXT() {
+            if (!lastCalc) {
+                alert('Κάντε πρώτα υπολογισμό!');
+                return;
+            }
+            let c = lastCalc;
+            let out = '='.repeat(80) + '\n';
+            out += 'ΑΝΑΛΥΣΗ ΟΜΟΛΟΓΟΥ\n';
+            out += '='.repeat(80) + '\n\n';
+            out += 'ΣΤΟΙΧΕΙΑ ΟΜΟΛΟΓΟΥ\n';
+            out += '-'.repeat(80) + '\n';
+            out += 'Ονομαστική Αξία:           €' + fmt(c.fv) + '\n';
+            out += 'Market Value (Clean Price): €' + fmt(c.mv) + '\n';
+            out += 'Προπληρωμένο Κουπόνι:      €' + fmt(c.acc) + '\n';
+            out += 'Μικτή Τιμή (Dirty Price):   €' + fmt(c.dirty) + '\n';
+            out += '-'.repeat(80) + '\n';
+            out += 'Επιτόκιο Κουπονιού:         ' + c.cr + '%\n';
+            out += 'YTM:                        ' + c.ytm.toFixed(4) + '%\n';
+            out += 'Συχνότητα:                  ' + (12/c.fr) + ' φορές/έτος\n';
+            out += 'Βάση Ημερών:                ' + c.db + '\n';
+            out += '-'.repeat(80) + '\n';
+            out += 'Ημερομηνία Έκδοσης:         ' + fmtDate(c.id) + '\n';
+            out += 'Value Day / Αγοράς:         ' + fmtDate(c.vd) + '\n';
+            out += 'Ημερομηνία Λήξης:           ' + fmtDate(c.md) + '\n';
+            out += 'Τελευταίο Κουπόνι:          ' + fmtDate(c.lastC) + '\n';
+            out += 'Επόμενο Κουπόνι:            ' + fmtDate(c.nextC) + '\n';
+            out += 'Ημέρες Accrued:             ' + c.accDays + '\n';
+            out += 'Ημέρες έως Επόμενο:         ' + c.daysToNext + '\n';
+            // ΝΕΟ: Διάρκεια στο export
+            out += 'Διάρκεια Ομολόγου:          ' + c.duration.years + ' έτη, ' + c.duration.months + ' μήνες, ' + c.duration.days + ' ημέρες (' + c.duration.totalYears.toFixed(2) + ' χρόνια)\n';
+            out += 'Συνολικές Περίοδοι:         ' + c.future.length + '\n';
+            out += '-'.repeat(80) + '\n\n';
+            
+            // ΣΥΝΟΛΑ
+            out += 'ΣΥΝΟΛΙΚΕΣ ΤΑΜΕΙΑΚΕΣ ΡΟΕΣ\n';
+            out += '-'.repeat(80) + '\n';
+            out += 'Σύνολο Κουπονιών:           €' + fmt(c.totalCoupons) + '\n';
+            out += 'Κεφάλαιο Λήξης:             €' + fmt(c.fv) + '\n';
+            out += 'ΣΥΝΟΛΙΚΕΣ ΕΙΣΠΡΑΞΕΙΣ:       €' + fmt(c.totalCashFlows) + '\n';
+            out += 'Μικτή Τιμή (Κόστος):        €' + fmt(c.dirty) + '\n';
+            out += 'Κέρδος / Ζημία στη Λήξη:    €' + fmt(c.profitLoss) + '\n';
+            out += '-'.repeat(80) + '\n\n';
+            
+            out += 'ΑΝΑΛΥΤΙΚΕΣ ΤΑΜΕΙΑΚΕΣ ΡΟΕΣ\n';
+            out += '='.repeat(80) + '\n';
+            out += 'Περ  Ημερομηνία      Ημέρες  Κουπόνι        Κεφάλαιο       Σύνολο\n';
+            out += '-'.repeat(80) + '\n';
+            
+            let prev = c.vd;
+            for (let i = 0; i < c.future.length; i++) {
+                let d = c.future[i];
+                let ds = days(prev, d);
+                let isLast = i === c.future.length - 1;
+                let pr = isLast ? c.fv : 0;
+                let tot = c.cp + pr;
+                out += (i+1).toString().padEnd(4) + ' ' +
+                       fmtDate(d).padEnd(15) + ' ' +
+                       ds.toString().padEnd(7) + ' €' +
+                       fmt(c.cp).padEnd(14) + ' €' +
+                       fmt(pr).padEnd(14) + ' €' +
+                       fmt(tot) + '\n';
+                prev = d;
+            }
+            out += '='.repeat(80) + '\n';
+
+            let blob = new Blob([out], { type: 'text/plain;charset=utf-8' });
+            let url = URL.createObjectURL(blob);
+            let a = document.createElement('a');
+            a.href = url;
+            a.download = 'bond_' + fmtDate(new Date()).replace(/\//g, '-') + '.txt';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Defaults
+        let t = new Date();
+        document.getElementById('id').valueAsDate = t;
+        document.getElementById('vd').valueAsDate = t;
+        let f = new Date(t);
+        f.setFullYear(f.getFullYear() + 7);
+        document.getElementById('md').valueAsDate = f;
+    </script>
+</body>
+</html>
