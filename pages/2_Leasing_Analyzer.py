@@ -1,5 +1,12 @@
 import streamlit as st
 
+# =========================
+# Helper: Euro Formatting
+# =========================
+def euro(x):
+    return "€{:,.0f}".format(x).replace(",", ".")
+
+
 st.set_page_config(page_title="Leasing Buyout Analyzer", layout="wide")
 
 st.title("🚗 Leasing Buyout Analyzer (ΙΧ – 5ετία)")
@@ -17,7 +24,6 @@ st.divider()
 # =========================
 # INPUTS
 # =========================
-
 st.header("📌 Στοιχεία Leasing")
 
 col1, col2, col3 = st.columns(3)
@@ -36,8 +42,7 @@ st.divider()
 # =========================
 # BUYOUT + RESIDUAL MODEL
 # =========================
-
-st.subheader("📉 Υπολογισμός Αναμενόμενης Αξίας (Residual %)")
+st.subheader("📉 Αναμενόμενη Αξία Αγοράς (Residual %)")
 
 col4, col5, col6 = st.columns(3)
 
@@ -59,12 +64,11 @@ with col6:
         value=40
     )
 
-# Auto-calculated expected market value
 expected_market_value = purchase_price * (residual_pct / 100)
 
 st.info(
     f"📌 Αναμενόμενη Αξία Αγοράς σε 5 χρόνια (auto): "
-    f"**€{expected_market_value:,.0f}**"
+    f"**{euro(expected_market_value)}**"
 )
 
 st.divider()
@@ -72,7 +76,6 @@ st.divider()
 # =========================
 # TAX SETTINGS
 # =========================
-
 st.header("🏛️ Φορολογικά")
 
 tax_rate = 0.22
@@ -86,27 +89,25 @@ st.info(f"""
 # =========================
 # CALCULATIONS
 # =========================
-
 total_leasing_cost = monthly_payment * duration_months + down_payment
 tax_benefit = total_leasing_cost * tax_rate * deductibility
 net_cost = total_leasing_cost - tax_benefit
 
 difference = expected_market_value - buyout_price
 
-# Dynamic threshold (5% of market value)
+# Dynamic threshold (5%)
 threshold = expected_market_value * 0.05
 
 # =========================
 # RESULTS
 # =========================
-
 st.header("📊 Αποτελέσματα")
 
 r1, r2, r3 = st.columns(3)
 
-r1.metric("Συνολικό Κόστος Leasing", f"€{total_leasing_cost:,.2f}")
-r2.metric("Φορολογικό Όφελος", f"€{tax_benefit:,.2f}")
-r3.metric("Καθαρό Κόστος μετά Φόρου", f"€{net_cost:,.2f}")
+r1.metric("Συνολικό Κόστος Leasing", euro(total_leasing_cost))
+r2.metric("Φορολογικό Όφελος", euro(tax_benefit))
+r3.metric("Καθαρό Κόστος μετά Φόρου", euro(net_cost))
 
 st.divider()
 
@@ -117,10 +118,10 @@ if difference > threshold:
     st.success(f"""
 🟢 Συμφέρει η εξαγορά!
 
-Η τιμή εξαγοράς είναι **€{difference:,.0f} κάτω**
+Η τιμή εξαγοράς είναι **{euro(difference)} κάτω**
 από την αναμενόμενη αγοραία αξία.
 
-(Expected Value: €{expected_market_value:,.0f})
+(Expected Value: {euro(expected_market_value)})
 """)
 
 elif -threshold <= difference <= threshold:
@@ -129,17 +130,17 @@ elif -threshold <= difference <= threshold:
 
 Η τιμή εξαγοράς είναι πολύ κοντά στην αγορά.
 
-Διαφορά: €{difference:,.0f}
+Διαφορά: {euro(difference)}
 """)
 
 else:
     st.error(f"""
 🔴 Δεν συμφέρει η εξαγορά.
 
-Η εταιρεία ζητάει **€{-difference:,.0f} πάνω**
+Η εταιρεία ζητάει **{euro(-difference)} πάνω**
 από την αναμενόμενη αξία αγοράς.
 
-(Expected Value: €{expected_market_value:,.0f})
+(Expected Value: {euro(expected_market_value)})
 """)
 
 st.divider()
@@ -147,7 +148,6 @@ st.divider()
 # =========================
 # EMAIL GENERATOR
 # =========================
-
 st.header("✉️ Email προς Leasing Εταιρεία")
 
 company_name = st.text_input("Όνομα Leasing Εταιρείας", value="(εταιρεία leasing)")
@@ -163,17 +163,17 @@ email_text = f"""
 
 Σύμφωνα με την προσφορά σας, η τιμή εξαγοράς ανέρχεται σε:
 
-• €{buyout_price:,.0f}
+• {euro(buyout_price)}
 
 Με βάση την εκτιμώμενη αγοραία αξία του οχήματος σε 5 χρόνια,
 η οποία προκύπτει από residual rate {residual_pct}% επί της σημερινής αξίας αγοράς,
 η αναμενόμενη αξία διαμορφώνεται περίπου σε:
 
-• €{expected_market_value:,.0f}
+• {euro(expected_market_value)}
 
-Η διαφορά ανέρχεται σε:
+Η διαφορά ανέρχεται σε περίπου:
 
-• €{abs(difference):,.0f}
+• {euro(abs(difference))}
 
 Παρακαλώ όπως εξετάσετε τη δυνατότητα αναπροσαρμογής της τιμής εξαγοράς
 σε επίπεδα πιο κοντά στην πραγματική αξία αγοράς και μου αποστείλετε
