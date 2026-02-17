@@ -209,6 +209,30 @@ else:
 
     st.table(rows)
 
+# =========================
+# CHART: Residual % vs Cost Difference
+# =========================
+st.markdown("### 📉 Chart: Residual % → Buy vs Leasing Difference")
+
+chart_data = {
+    "Residual %": [],
+    "Diff (Buy - Leasing) €": []
+}
+
+rp = sens_min
+while rp <= sens_max:
+    resale = car_price * (rp / 100.0)
+    buy_cost_s = down_payment_buy + total_loan_paid - resale
+    diff_s = buy_cost_s - leasing_total
+
+    chart_data["Residual %"].append(rp)
+    chart_data["Diff (Buy - Leasing) €"].append(diff_s)
+
+    rp += sens_step
+
+st.line_chart(chart_data, x="Residual %", y="Diff (Buy - Leasing) €")
+
+
 # PREMIUM: Export report
 report_text = f"""
 Leasing vs Buy + Loan Report
