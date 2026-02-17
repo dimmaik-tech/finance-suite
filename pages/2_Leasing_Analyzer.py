@@ -31,16 +31,41 @@ with col2:
 with col3:
     down_payment = st.number_input("Προκαταβολή (€)", value=0.0)
 
-col4, col5 = st.columns(2)
+st.divider()
+
+# =========================
+# BUYOUT + RESIDUAL MODEL
+# =========================
+
+st.subheader("📉 Υπολογισμός Αναμενόμενης Αξίας (Residual %)")
+
+col4, col5, col6 = st.columns(3)
 
 with col4:
     buyout_price = st.number_input("Τιμή Εξαγοράς στο Τέλος (€)", value=20000.0)
 
 with col5:
-    expected_market_value = st.number_input(
-        "Αναμενόμενη Αξία Αγοράς σε 5 χρόνια (€)",
-        value=23000.0
+    purchase_price = st.number_input(
+        "Τιμή Αγοράς Σήμερα (€)",
+        value=50000.0,
+        step=1000.0
     )
+
+with col6:
+    residual_pct = st.slider(
+        "Residual % σε 5 χρόνια",
+        min_value=20,
+        max_value=60,
+        value=40
+    )
+
+# Auto-calculated expected market value
+expected_market_value = purchase_price * (residual_pct / 100)
+
+st.info(
+    f"📌 Αναμενόμενη Αξία Αγοράς σε 5 χρόνια (auto): "
+    f"**€{expected_market_value:,.0f}**"
+)
 
 st.divider()
 
@@ -68,6 +93,9 @@ net_cost = total_leasing_cost - tax_benefit
 
 difference = expected_market_value - buyout_price
 
+# Dynamic threshold (5% of market value)
+threshold = expected_market_value * 0.05
+
 # =========================
 # RESULTS
 # =========================
@@ -85,26 +113,33 @@ st.divider()
 # Verdict
 st.subheader("💡 Απόφαση Εξαγοράς")
 
-if difference > 2000:
+if difference > threshold:
     st.success(f"""
 🟢 Συμφέρει η εξαγορά!
 
 Η τιμή εξαγοράς είναι **€{difference:,.0f} κάτω**
-από την εκτιμώμενη αγοραία αξία.
+από την αναμενόμενη αγοραία αξία.
+
+(Expected Value: €{expected_market_value:,.0f})
 """)
-elif -2000 <= difference <= 2000:
+
+elif -threshold <= difference <= threshold:
     st.warning(f"""
 🟡 Οριακή περίπτωση.
 
 Η τιμή εξαγοράς είναι πολύ κοντά στην αγορά.
+
 Διαφορά: €{difference:,.0f}
 """)
+
 else:
     st.error(f"""
 🔴 Δεν συμφέρει η εξαγορά.
 
 Η εταιρεία ζητάει **€{-difference:,.0f} πάνω**
-από την εκτιμώμενη αξία αγοράς.
+από την αναμενόμενη αξία αγοράς.
+
+(Expected Value: €{expected_market_value:,.0f})
 """)
 
 st.divider()
@@ -130,12 +165,13 @@ email_text = f"""
 
 • €{buyout_price:,.0f}
 
-Ωστόσο, με βάση την εκτιμώμενη αγοραία αξία του οχήματος κατά το τέλος της μίσθωσης,
-η οποία υπολογίζεται περίπου σε:
+Με βάση την εκτιμώμενη αγοραία αξία του οχήματος σε 5 χρόνια,
+η οποία προκύπτει από residual rate {residual_pct}% επί της σημερινής αξίας αγοράς,
+η αναμενόμενη αξία διαμορφώνεται περίπου σε:
 
 • €{expected_market_value:,.0f}
 
-η διαφορά ανέρχεται σε περίπου:
+Η διαφορά ανέρχεται σε:
 
 • €{abs(difference):,.0f}
 
