@@ -171,6 +171,27 @@ else:
     st.table(rows)
 
 # =========================
+# CHART: Residual % vs Equity
+# =========================
+st.markdown("### 📉 Chart: Residual % → Equity (Market - Buyout)")
+
+chart_data = {
+    "Residual %": [],
+    "Equity (€)": []
+}
+
+rp = sens_min
+while rp <= sens_max:
+    mv = purchase_price * (rp / 100.0)
+    diff = mv - buyout_price
+    chart_data["Residual %"].append(rp)
+    chart_data["Equity (€)"].append(diff)
+    rp += sens_step
+
+st.line_chart(chart_data, x="Residual %", y="Equity (€)")
+
+
+# =========================
 # EMAIL GENERATOR
 # =========================
 st.divider()
