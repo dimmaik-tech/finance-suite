@@ -1,3 +1,9 @@
+import streamlit as st
+from auth import require_login, show_logout_button, admin_badge
+require_login("Finance Suite")
+admin_badge()
+show_logout_button(key="logout_fin_home")
+
 from auth import require_login, show_logout
 require_login("Finance Suite")
 show_logout()
@@ -17,4 +23,5 @@ st.markdown("""
 
 ➡️ Επίλεξε εργαλείο από το menu αριστερά.
 """)
+
 
