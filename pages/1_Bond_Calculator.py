@@ -7,7 +7,6 @@ show_logout_button(key="logout_bond")
 
 # 🔐 Login Protection
 require_login("Finance Suite")
-show_logout()
 show_logout_button(key="logout_bond")
 
 # ✅ Page Content
