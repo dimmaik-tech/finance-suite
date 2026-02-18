@@ -1,3 +1,7 @@
+from auth import require_login, show_logout
+require_login("Finance Suite")
+show_logout()
+
 import streamlit as st
 import math
 
