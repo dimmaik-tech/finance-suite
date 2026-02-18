@@ -1,12 +1,13 @@
 import streamlit as st
-from auth import require_login, show_logout
+from auth import require_login, show_logout_button, admin_badge
 st.set_page_config(
     page_title="Leasing Analyzer",
     layout="wide"
 )
 
 require_login("Finance Suite")
-show_logout()
+admin_badge()
+show_logout_button(key="logout_bond")
 
 
 import math
