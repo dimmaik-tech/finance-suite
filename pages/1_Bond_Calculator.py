@@ -5,6 +5,7 @@ require_login("Finance Suite")
 admin_badge()
 show_logout_button(key="logout_bond")
 
+
 # 🔐 Login Protection
 require_login("Finance Suite")
 show_logout_button(key="logout_bond")
