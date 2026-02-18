@@ -1,3 +1,7 @@
+from auth import require_login, show_logout
+require_login("Finance Suite")
+show_logout()
+
 import streamlit as st
 
 st.set_page_config(page_title="Finance Suite", layout="wide")
@@ -13,3 +17,4 @@ st.markdown("""
 
 ➡️ Επίλεξε εργαλείο από το menu αριστερά.
 """)
+
