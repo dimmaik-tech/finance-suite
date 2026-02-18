@@ -1,8 +1,9 @@
 import streamlit as st
-from auth import require_login, show_logout_button, admin_badge
+from auth import require_login, show_logout
+st.set_page_config(page_title="Bond Calculator", layout="wide")  # αν έχεις
 require_login("Finance Suite")
-admin_badge()
-show_logout_button(key="logout_fin_page_1")  # unique key
+show_logout()
+
 
 import streamlit as st
 
