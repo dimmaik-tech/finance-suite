@@ -585,52 +585,47 @@ var annualService=parseFloat(document.getElementById('annualService').value)||0;
 var residualYears=parseInt(document.getElementById('residualYears').value)||8;
 var marketCondition=document.getElementById('marketCondition').value;
 var customDepreciation=parseFloat(document.getElementById('customDepreciation').value)||20;
+
 var vatRate=0.24;
 var isElectric=vehicleType==='bev';
-var years=5; // 5 years comparison
+var years=5;
 
-// RESIDUAL VALUE ESTIMATION
-var residualEstimate=estimateResidualValue(ltvp,residualYears,vehicleType,marketCondition,customDepreciation);
-document.getElementById('estimatedResidual').textContent=euro(residualEstimate.value);
-document.getElementById('residualPercentage').textContent=pct(residualEstimate.percentage);
-document.getElementById('avgAnnualDepreciation').textContent=pct(residualEstimate.annualRate);
-
-var vehicleTypeNames={'conventional':'Συμβατικό (15% ετήσια απόσβεση)','hev':'Υβριδικό HEV (16% ετήσια απόσβεση)','phev':'Plug-in Hybrid (18% ετήσια απόσβεση)','bev':'Ηλεκτρικό BEV (22% ετήσια απόσβεση)'};
-var marketNames={'optimistic':'Αισιόδοξο (-15% απόσβεση)','normal':'Κανονική (χωρίς αλλαγή)','pessimistic':'Απαισιόδοξο (+15% απόσβεση)'};
-
-document.getElementById('residualCalculationDetails').innerHTML='<strong>Παράμετροι Εκτίμησης:</strong><br>• Τύπος οχήματος: '+vehicleTypeNames[vehicleType]+'<br>• Χρόνια: '+residualYears+'<br>• Κατάσταση αγοράς: '+marketNames[marketCondition]+'<br>• Προσαρμοσμένη ετήσια απόσβεση: '+pct(residualEstimate.annualRate)+'<br><br><strong>Υπολογισμός:</strong> '+euro(ltvp)+' × (1 - '+pct(residualEstimate.annualRate)+')^'+residualYears+' = '+euro(residualEstimate.value)+'<br><em>Ελάχιστο όριο 5%: '+euro(ltvp*0.05)+'</em>';
-
-// Calculate enhancement rates
+// ---------------- BEV RATES ----------------
 var enhancement50pct=0,enhancement25pct=0;
 if(isElectric&&ltvp>0){
-if(ltvp<=40000){enhancement50pct=1;enhancement25pct=0;}else{enhancement50pct=40000/ltvp;enhancement25pct=1-enhancement50pct;}
+if(ltvp<=40000){enhancement50pct=1;}
+else{enhancement50pct=40000/ltvp;enhancement25pct=1-enhancement50pct;}
 }
 
-// LEASING CALCULATIONS
+// ---------------- LEASING ----------------
 var monthlyPaymentNet=usageType==='ix'?monthlyPayment:monthlyPayment/(1+vatRate);
-var annualPayment=monthlyPayment*12;
 var annualPaymentNet=monthlyPaymentNet*12;
+var leasingYears=durationMonths/12;
+
+// 🔥 ΣΩΣΤΗ ΚΑΤΑΝΟΜΗ ΠΡΟΚΑΤΑΒΟΛΗΣ
+var annualDownPayment=downPaymentLeasing/leasingYears;
+
+// 🔥 ΣΩΣΤΗ ΒΑΣΗ
+var annualBaseLeasing=annualPaymentNet+annualDownPayment;
+
+var annualEnhancement50=isElectric?annualBaseLeasing*enhancement50pct*0.5:0;
+var annualEnhancement25=isElectric?annualBaseLeasing*enhancement25pct*0.25:0;
+
+var annualLeasingDeduction=annualBaseLeasing+annualEnhancement50+annualEnhancement25;
+var totalLeasingDeduction=annualLeasingDeduction*leasingYears;
+
+var taxBenefitLeasing=totalLeasingDeduction*taxRate*deductibility;
+
 var totalLeasingPayments=monthlyPayment*durationMonths;
 var leasingAcquisitionCost=totalLeasingPayments+downPaymentLeasing+buyoutPrice;
-var annualEnhancement50=isElectric?annualPaymentNet*enhancement50pct*0.5:0;
-var annualEnhancement25=isElectric?annualPaymentNet*enhancement25pct*0.25:0;
-var annualLeasingDeduction=annualPaymentNet+annualEnhancement50+annualEnhancement25;
-var totalLeasingDeduction=annualLeasingDeduction*(durationMonths/12);
-var taxBenefitLeasing=totalLeasingDeduction*taxRate*deductibility;
 var netCostLeasing=leasingAcquisitionCost-taxBenefitLeasing;
 
-// Extra costs for leasing (0 - included in monthly payment)
-var leasingInsuranceTotal=0;
-var leasingServiceTotal=0;
-var leasingTotalCosts=netCostLeasing;
-
-// LOAN CALCULATIONS
+// ---------------- LOAN ----------------
 var monthlyLoanPayment=calculateLoanPayment(loanAmount,loanInterest,loanDuration);
 var totalLoanPayments=monthlyLoanPayment*loanDuration;
 var totalInterestPaid=totalLoanPayments-loanAmount;
 var loanAcquisitionCost=downPaymentLoan+totalLoanPayments;
 
-// Extra costs for loan (insurance + service)
 var insuranceTotal=annualInsurance*years;
 var serviceTotal=annualService*years;
 var extraCostsTotal=insuranceTotal+serviceTotal;
@@ -640,127 +635,40 @@ var totalLoanCosts=loanAcquisitionCost+extraCostsTotal;
 var depreciableAmount=ltvp-residualValue;
 var annualDepreciation=depreciableAmount*(depreciationRate/100);
 var totalDepreciation5y=Math.min(annualDepreciation*5,depreciableAmount);
+
 var totalLoanDeduction=totalDepreciation5y+totalInterestPaid;
 var taxBenefitLoan=totalLoanDeduction*taxRate;
 var netCostLoan=totalLoanCosts-taxBenefitLoan;
 
-// UPDATE UI - Comparison Table
+// ---------------- UI UPDATE ----------------
 document.getElementById('compLeasingTotal').textContent=euro(leasingAcquisitionCost);
 document.getElementById('compLoanTotal').textContent=euro(loanAcquisitionCost);
-document.getElementById('compLeasingInsurance').textContent=euro(0)+' (συμπεριλ.)';
-document.getElementById('compLoanInsurance').textContent=euro(insuranceTotal);
-document.getElementById('compLeasingService').textContent=euro(0)+' (συμπεριλ.)';
-document.getElementById('compLoanService').textContent=euro(serviceTotal);
-document.getElementById('compLeasingAllCosts').textContent=euro(leasingAcquisitionCost);
-document.getElementById('compLoanAllCosts').textContent=euro(totalLoanCosts);
 document.getElementById('compLeasingDeduction').textContent=euro(totalLeasingDeduction);
 document.getElementById('compLoanDeduction').textContent=euro(totalLoanDeduction);
 document.getElementById('compLeasingTaxBenefit').textContent=euro(taxBenefitLeasing);
 document.getElementById('compLoanTaxBenefit').textContent=euro(taxBenefitLoan);
 document.getElementById('compLeasingNet').innerHTML='<b>'+euro(netCostLeasing)+'</b>';
 document.getElementById('compLoanNet').innerHTML='<b>'+euro(netCostLoan)+'</b>';
-document.getElementById('compLeasingAnnual').textContent=euro(netCostLeasing/5);
-document.getElementById('compLoanAnnual').textContent=euro(netCostLoan/5);
+document.getElementById('leasingTaxBenefit').textContent=euro(taxBenefitLeasing);
+document.getElementById('leasingNetCost').textContent=euro(netCostLeasing);
+document.getElementById('loanTaxBenefit2').textContent=euro(taxBenefitLoan);
 
-// Winner - ΣΩΣΤΗ ΛΟΓΙΚΗ
-var diff=netCostLeasing-netCostLoan; // Leasing - Αγορά (θετικό = Leasing ακριβότερο)
+// Winner
+var diff=netCostLeasing-netCostLoan;
 var winnerDiv=document.getElementById('winnerResult');
+
 if(diff>1000){
-// Leasing ακριβότερο → Αγορά συμφέρει
 winnerDiv.className='result-box result-success';
-winnerDiv.innerHTML='<h3>🟢 Η Αγορά με Δάνειο συμφέρει!</h3><p>Κερδίζετε: <b>'+euro(diff)+'</b> σε 5 χρόνια<br>('+euro(diff/5)+'/έτος)<br><small>Το Leasing είναι ακριβότερο κατά '+euro(diff)+'</small></p>';
+winnerDiv.innerHTML='<h3>🟢 Η Αγορά με Δάνειο συμφέρει!</h3>';
 }
 else if(diff<-1000){
-// Αγορά ακριβότερη → Leasing συμφέρει
 winnerDiv.className='result-box result-error';
-winnerDiv.innerHTML='<h3>🔴 Το Leasing συμφέρει!</h3><p>Κερδίζετε: <b>'+euro(Math.abs(diff))+'</b> σε 5 χρόνια<br>('+euro(Math.abs(diff)/5)+'/έτος)<br><small>Η Αγορά είναι ακριβότερη κατά '+euro(Math.abs(diff))+'</small></p>';
+winnerDiv.innerHTML='<h3>🔴 Το Leasing συμφέρει!</h3>';
 }
 else{
 winnerDiv.className='result-box result-warning';
-winnerDiv.innerHTML='<h3>🟡 Οριακή διαφορά</h3><p>Διαφορά: <b>'+euro(Math.abs(diff))+'</b><br>Επιλέξτε με βάση άλλα κριτήρια (ευελιξία, κτλ.)</p>';
+winnerDiv.innerHTML='<h3>🟡 Οριακή διαφορά</h3>';
 }
-
-// Summary Results
-document.getElementById('leasingPayments').textContent=euro(totalLeasingPayments);
-document.getElementById('leasingTotalCost').textContent=euro(leasingAcquisitionCost);
-document.getElementById('leasingTaxBenefit').textContent=euro(taxBenefitLeasing);
-document.getElementById('leasingNetCost').textContent=euro(netCostLeasing);
-
-document.getElementById('loanMonthly').textContent=euro(monthlyLoanPayment);
-document.getElementById('loanInterestTotal').textContent=euro(totalInterestPaid);
-document.getElementById('loanExtraCosts').textContent=euro(extraCostsTotal);
-document.getElementById('loanTaxBenefit2').textContent=euro(taxBenefitLoan);
-
-// Enhancement details
-var enhSummaryDiv=document.getElementById('enhancementDetails');
-if(isElectric){
-enhSummaryDiv.style.display='block';
-document.getElementById('enh50pct').textContent=pct(enhancement50pct*100);
-document.getElementById('enh25pct').textContent=pct(enhancement25pct*100);
-document.getElementById('enh50amount').textContent=euro(annualEnhancement50);
-document.getElementById('enh25amount').textContent=euro(annualEnhancement25);
-document.getElementById('enhancementCalc').innerHTML='<strong>Υπολογισμός Προσαύξησης:</strong><br>- ΛΤΠΦ: '+euro(ltvp)+'<br>- Έως €40.000 ('+pct(enhancement50pct*100)+'): '+euro(annualPaymentNet*enhancement50pct)+' × 50% = <strong>'+euro(annualEnhancement50)+'/έτος</strong><br>- Υπερβάλλον ('+pct(enhancement25pct*100)+'): '+euro(annualPaymentNet*enhancement25pct)+' × 25% = <strong>'+euro(annualEnhancement25)+'/έτος</strong><br>- Βασική έκπτωση: '+euro(annualPaymentNet)+'/έτος<br>- <strong>Σύνολο ετήσιας έκπτωσης: '+euro(annualLeasingDeduction)+'/έτος</strong><br>- <strong>Σύνολο περιόδου: '+euro(totalLeasingDeduction)+'</strong>';
-}else{enhSummaryDiv.style.display='none';}
-
-// Loan details
-var yearsOfDepreciation=annualDepreciation>0?Math.ceil((ltvp-residualValue)/annualDepreciation):0;
-document.getElementById('loanDetails').innerHTML='<strong>Κόστος απόκτησης:</strong> '+euro(loanAcquisitionCost)+'<br><strong>Έξοδα ασφάλειας:</strong> '+euro(insuranceTotal)+'<br><strong>Έξοδα service:</strong> '+euro(serviceTotal)+'<br><strong>Σύνολο εξόδων:</strong> '+euro(totalLoanCosts)+'<br><strong>Απόσβεση:</strong> '+euro(annualDepreciation)+'/έτος<br><strong>Σύνολο εκπιπτέων:</strong> '+euro(totalLoanDeduction);
-
-// DETAILED CALCULATIONS
-var monthlyRate=(loanInterest/100)/12;
-
-// Leasing calculations detail
-document.getElementById('calcLeasingStep1').innerHTML=euro(monthlyPayment)+' × 12 = <strong>'+euro(annualPayment)+'</strong>';
-document.getElementById('calcLeasingVatDetail').textContent=usageType==='ix'?'ΙΧ: Εκπίπτει όλο το ποσό με ΦΠΑ (€'+formatNumber(monthlyPayment)+')':'Εταιρικό: Εκπίπτει η καθαρή αξία €'+formatNumber(monthlyPaymentNet)+' (ο ΦΠΑ συμψηφίζεται)';
-
-var enhDiv=document.getElementById('calcEnhancementStep');
-if(isElectric){
-enhDiv.style.display='block';
-var portion50=annualPaymentNet*enhancement50pct;
-var portion25=annualPaymentNet*enhancement25pct;
-document.getElementById('calcEnhancementDetail').innerHTML='ΛΤΠΦ = '+euro(ltvp)+' (> €40.000, οπότε χωρίζεται σε δύο κλιμάκια)<br><br><strong>Κλιμάκιο 50%:</strong><br>Ποσοστό: '+pct(enhancement50pct*100)+' του μισθώματος<br>Ποσό: '+euro(annualPaymentNet)+' × '+pct(enhancement50pct*100)+' = '+euro(portion50)+'<br>Προσαύξηση: '+euro(portion50)+' × 50% = <strong>'+euro(annualEnhancement50)+'</strong><br><br><strong>Κλιμάκιο 25%:</strong><br>Ποσοστό: '+pct(enhancement25pct*100)+' του μισθώματος<br>Ποσό: '+euro(annualPaymentNet)+' × '+pct(enhancement25pct*100)+' = '+euro(portion25)+'<br>Προσαύξηση: '+euro(portion25)+' × 25% = <strong>'+euro(annualEnhancement25)+'</strong>';
-}else{enhDiv.style.display='none';}
-
-document.getElementById('calcLeasingDeduction').innerHTML=isElectric?'Βασική έκπτωση: '+euro(annualPaymentNet)+'<br>+ Προσαύξηση 50%: '+euro(annualEnhancement50)+'<br>+ Προσαύξηση 25%: '+euro(annualEnhancement25):'Βασική έκπτωση: '+euro(annualPaymentNet)+' (χωρίς προσαύξηση - όχι BEV)';
-document.getElementById('calcLeasingDeductionResult').textContent='Σύνολο: '+euro(annualLeasingDeduction)+'/έτος';
-document.getElementById('calcLeasingPeriod').innerHTML=euro(annualLeasingDeduction)+' × '+(durationMonths/12)+' έτη = <strong>'+euro(totalLeasingDeduction)+'</strong>';
-document.getElementById('calcLeasingTaxBenefitDetail').innerHTML=euro(totalLeasingDeduction)+' × '+pct(taxRate*100)+' × '+pct(deductibility*100)+' = <strong>'+euro(taxBenefitLeasing)+'</strong>';
-document.getElementById('calcLeasingTaxBenefitResult').textContent='Φορολογικό όφελος: '+euro(taxBenefitLeasing);
-document.getElementById('calcLeasingAcquisition').innerHTML=euro(totalLeasingPayments)+' + '+euro(downPaymentLeasing)+' + '+euro(buyoutPrice)+' = <strong>'+euro(leasingAcquisitionCost)+'</strong>';
-document.getElementById('calcLeasingNetDetail').innerHTML=euro(leasingAcquisitionCost)+' - '+euro(taxBenefitLeasing)+' = <strong>'+euro(netCostLeasing)+'</strong>';
-document.getElementById('calcLeasingNetResult').textContent='Καθαρό κόστος Leasing: '+euro(netCostLeasing);
-
-// Loan calculations detail
-document.getElementById('calcLoanStep1').innerHTML='P='+euro(loanAmount)+', r='+(monthlyRate*100).toFixed(4)+'%, n='+loanDuration+'<br>Μηνιαία δόση = <strong>'+euro(monthlyLoanPayment)+'</strong>';
-document.getElementById('calcLoanInterest').innerHTML='('+euro(monthlyLoanPayment)+' × '+loanDuration+') - '+euro(loanAmount)+' = <strong>'+euro(totalInterestPaid)+'</strong>';
-document.getElementById('calcLoanInterestResult').textContent='Συνολικοί τόκοι: '+euro(totalInterestPaid);
-document.getElementById('calcLoanTotalPaid').innerHTML=euro(monthlyLoanPayment)+' × '+loanDuration+' = <strong>'+euro(totalLoanPayments)+'</strong>';
-document.getElementById('calcLoanAcquisition').innerHTML=euro(downPaymentLoan)+' + '+euro(totalLoanPayments)+' = <strong>'+euro(loanAcquisitionCost)+'</strong>';
-document.getElementById('calcInsuranceDetail').innerHTML=euro(annualInsurance)+'/έτος × '+years+' έτη = <strong>'+euro(insuranceTotal)+'</strong>';
-document.getElementById('calcServiceDetail').innerHTML=euro(annualService)+'/έτος × '+years+' έτη = <strong>'+euro(serviceTotal)+'</strong>';
-document.getElementById('calcTotalExpenses').innerHTML=euro(loanAcquisitionCost)+' + '+euro(insuranceTotal)+' + '+euro(serviceTotal)+' = <strong>'+euro(totalLoanCosts)+'</strong>';
-document.getElementById('calcTotalExpensesResult').textContent='Σύνολο εξόδων αγοράς: '+euro(totalLoanCosts);
-document.getElementById('calcDepreciation').innerHTML='('+euro(ltvp)+' - '+euro(residualValue)+') × '+pct(depreciationRate)+' = <strong>'+euro(annualDepreciation)+'</strong>/έτος';
-var actualDepreciationYears=Math.min(5,yearsOfDepreciation);
-document.getElementById('calcDepreciation5y').innerHTML=euro(annualDepreciation)+'/έτος × '+actualDepreciationYears+' έτη = <strong>'+euro(totalDepreciation5y)+'</strong>';
-document.getElementById('calcLoanDeduction').innerHTML=euro(totalDepreciation5y)+' + '+euro(totalInterestPaid)+' = <strong>'+euro(totalLoanDeduction)+'</strong>';
-document.getElementById('calcLoanDeductionResult').textContent='Σύνολο εκπιπτέων: '+euro(totalLoanDeduction);
-document.getElementById('calcLoanTaxBenefitDetail').innerHTML=euro(totalLoanDeduction)+' × '+pct(taxRate*100)+' = <strong>'+euro(taxBenefitLoan)+'</strong>';
-document.getElementById('calcLoanTaxBenefitResult').textContent='Φορολογικό όφελος: '+euro(taxBenefitLoan);
-document.getElementById('calcLoanNetDetail').innerHTML=euro(totalLoanCosts)+' - '+euro(taxBenefitLoan)+' = <strong>'+euro(netCostLoan)+'</strong>';
-document.getElementById('calcLoanNetResult').textContent='Καθαρό κόστος Αγοράς: '+euro(netCostLoan);
-
-// Final comparison
-document.getElementById('calcFinalComparison').innerHTML=euro(netCostLeasing)+' - '+euro(netCostLoan)+' = <strong>'+euro(diff)+'</strong>';
-var finalText;
-if(diff>1000){
-finalText='✅ Η Αγορά με Δάνειο συμφέρει! Το Leasing είναι ακριβότερο κατά '+euro(diff);
-}else if(diff<-1000){
-finalText='✅ Το Leasing συμφέρει! Η Αγορά είναι ακριβότερη κατά '+euro(Math.abs(diff));
-}else{
-finalText='⚖️ Οριακή διαφορά: '+euro(Math.abs(diff));
-}
-document.getElementById('calcFinalResult').textContent=finalText;
 
 generateEmail();
 }
