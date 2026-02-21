@@ -461,21 +461,6 @@ textarea{width:100%;min-height:400px;padding:15px;border:2px solid #ddd;border-r
 </div>
 
 <script>
-// Global variables for analysis data storage
-var analysisData = {
-    vehicleType: '', vehicleTypeName: '', ltvp: 0,
-    monthlyPayment: 0, durationMonths: 0, downPaymentLeasing: 0, buyoutPrice: 0,
-    totalLeasingPayments: 0, leasingAcquisitionCost: 0, taxBenefitLeasing: 0, netCostLeasing: 0,
-    downPaymentLoan: 0, loanAmount: 0, loanInterest: 0, loanDuration: 0,
-    monthlyLoanPayment: 0, totalLoanPayments: 0, totalInterestPaid: 0,
-    loanAcquisitionCost: 0, annualInsurance: 0, annualService: 0,
-    insuranceTotal: 0, serviceTotal: 0, extraCostsTotal: 0, totalLoanCosts: 0,
-    depreciationRate: 0, residualValue: 0, annualDepreciation: 0,
-    totalDepreciation5y: 0, totalLoanDeduction: 0, taxBenefitLoan: 0, netCostLoan: 0,
-    estimatedResidualValue: 0, estimatedResidualPercentage: 0, residualYears: 0,
-    difference: 0, winner: '', savings: 0
-};
-
 // Custom function for Greek number format with dot as thousands separator
 function euro(x){
 if(isNaN(x) || x === null || x === undefined) return '€0';
@@ -578,6 +563,9 @@ var monthlyRate=(annualRate/100)/12;
 if(monthlyRate===0)return principal/months;
 return principal*(monthlyRate*Math.pow(1+monthlyRate,months))/(Math.pow(1+monthlyRate,months)-1);
 }
+
+// Global variables for analysis data storage
+var analysisData={};
 
 function calculateAll(){
 var vehicleType=document.getElementById('vehicleType').value;
@@ -778,183 +766,149 @@ finalText='⚖️ Οριακή διαφορά: '+euro(Math.abs(diff));
 document.getElementById('calcFinalResult').textContent=finalText;
 
 // Store all data for email
-analysisData.vehicleType = vehicleType;
-analysisData.vehicleTypeName = vehicleTypeNames[vehicleType];
-analysisData.ltvp = ltvp;
-analysisData.monthlyPayment = monthlyPayment;
-analysisData.durationMonths = durationMonths;
-analysisData.downPaymentLeasing = downPaymentLeasing;
-analysisData.buyoutPrice = buyoutPrice;
-analysisData.totalLeasingPayments = totalLeasingPayments;
-analysisData.leasingAcquisitionCost = leasingAcquisitionCost;
-analysisData.taxBenefitLeasing = taxBenefitLeasing;
-analysisData.netCostLeasing = netCostLeasing;
-analysisData.downPaymentLoan = downPaymentLoan;
-analysisData.loanAmount = loanAmount;
-analysisData.loanInterest = loanInterest;
-analysisData.loanDuration = loanDuration;
-analysisData.monthlyLoanPayment = monthlyLoanPayment;
-analysisData.totalLoanPayments = totalLoanPayments;
-analysisData.totalInterestPaid = totalInterestPaid;
-analysisData.loanAcquisitionCost = loanAcquisitionCost;
-analysisData.annualInsurance = annualInsurance;
-analysisData.annualService = annualService;
-analysisData.insuranceTotal = insuranceTotal;
-analysisData.serviceTotal = serviceTotal;
-analysisData.extraCostsTotal = extraCostsTotal;
-analysisData.totalLoanCosts = totalLoanCosts;
-analysisData.depreciationRate = depreciationRate;
-analysisData.residualValue = residualValue;
-analysisData.annualDepreciation = annualDepreciation;
-analysisData.totalDepreciation5y = totalDepreciation5y;
-analysisData.totalLoanDeduction = totalLoanDeduction;
-analysisData.taxBenefitLoan = taxBenefitLoan;
-analysisData.netCostLoan = netCostLoan;
-analysisData.estimatedResidualValue = residualEstimate.value;
-analysisData.estimatedResidualPercentage = residualEstimate.percentage;
-analysisData.residualYears = residualYears;
-analysisData.difference = diff;
-analysisData.winner = diff > 1000 ? 'loan' : diff < -1000 ? 'leasing' : 'equal';
-analysisData.savings = Math.abs(diff);
+analysisData.vehicleType=vehicleType;
+analysisData.vehicleTypeName=vehicleTypeNames[vehicleType];
+analysisData.ltvp=ltvp;
+analysisData.monthlyPayment=monthlyPayment;
+analysisData.durationMonths=durationMonths;
+analysisData.downPaymentLeasing=downPaymentLeasing;
+analysisData.buyoutPrice=buyoutPrice;
+analysisData.totalLeasingPayments=totalLeasingPayments;
+analysisData.leasingAcquisitionCost=leasingAcquisitionCost;
+analysisData.taxBenefitLeasing=taxBenefitLeasing;
+analysisData.netCostLeasing=netCostLeasing;
+analysisData.downPaymentLoan=downPaymentLoan;
+analysisData.loanAmount=loanAmount;
+analysisData.loanInterest=loanInterest;
+analysisData.loanDuration=loanDuration;
+analysisData.monthlyLoanPayment=monthlyLoanPayment;
+analysisData.totalLoanPayments=totalLoanPayments;
+analysisData.totalInterestPaid=totalInterestPaid;
+analysisData.loanAcquisitionCost=loanAcquisitionCost;
+analysisData.annualInsurance=annualInsurance;
+analysisData.annualService=annualService;
+analysisData.insuranceTotal=insuranceTotal;
+analysisData.serviceTotal=serviceTotal;
+analysisData.extraCostsTotal=extraCostsTotal;
+analysisData.totalLoanCosts=totalLoanCosts;
+analysisData.depreciationRate=depreciationRate;
+analysisData.residualValue=residualValue;
+analysisData.annualDepreciation=annualDepreciation;
+analysisData.totalDepreciation5y=totalDepreciation5y;
+analysisData.totalLoanDeduction=totalLoanDeduction;
+analysisData.taxBenefitLoan=taxBenefitLoan;
+analysisData.netCostLoan=netCostLoan;
+analysisData.estimatedResidualValue=residualEstimate.value;
+analysisData.estimatedResidualPercentage=residualEstimate.percentage;
+analysisData.residualYears=residualYears;
+analysisData.difference=diff;
+analysisData.winner=diff>1000?'loan':diff<-1000?'leasing':'equal';
+analysisData.savings=Math.abs(diff);
 
 generateEmail();
 }
 
 function generateEmail(){
-var companyName = document.getElementById('companyName').value || '[Όνομα Εταιρείας]';
-var clientName = document.getElementById('clientName').value || '[Το όνομά σας]';
-var d = analysisData;
+var companyName=document.getElementById('companyName').value||'[Όνομα Εταιρείας]';
+var clientName=document.getElementById('clientName').value||'[Το όνομά σας]';
+var d=analysisData;
 
-// Υπολογισμός διαφοράς τιμής εξαγοράς vs εκτιμώμενης αξίας
-var buyoutVsMarket = d.buyoutPrice - d.estimatedResidualValue;
-var buyoutPremium = d.estimatedResidualValue > 0 ? ((d.buyoutPrice / d.estimatedResidualValue - 1) * 100) : 0;
+var buyoutVsMarket=d.buyoutPrice-d.estimatedResidualValue;
+var buyoutPremium=d.estimatedResidualValue>0?((d.buyoutPrice/d.estimatedResidualValue-1)*100):0;
+var isBuyoutHigh=buyoutVsMarket>1000;
+var buyoutAssessment=isBuyoutHigh?
+'ΜΗ ΣΥΜΦΕΡΟΥΣΑ - Υπερβαίνει την εκτιμώμενη αγοραία αξία κατά '+euro(buyoutVsMarket):
+'ΣΥΜΦΕΡΟΥΣΑ - Είναι κοντά ή κάτω από την εκτιμώμενη αγοραία αξία';
 
-// Προσδιορισμός αν η τιμή εξαγοράς είναι υψηλή
-var isBuyoutHigh = buyoutVsMarket > 1000;
-var buyoutAssessment = isBuyoutHigh ? 
-    'ΜΗ ΣΥΜΦΕΡΟΥΣΑ - Υπερβαίνει την εκτιμώμενη αγοραία αξία κατά ' + euro(buyoutVsMarket) :
-    'ΣΥΜΦΕΡΟΥΣΑ - Είναι κοντά ή κάτω από την εκτιμώμενη αγοραία αξία';
+var email='Θέμα: Αίτημα Αναθεώρησης Προσφοράς Leasing & Σύγκριση Κόστους Αυτοκινήτου\n\n'+
+'Αξιότιμοι κύριοι/κυρίες της '+companyName+',\n\n'+
+'Σας ευχαριστώ για την προσφορά σας. Πραγματοποίησα λεπτομερή οικονομική ανάλυση σύγκρισης μεταξύ του leasing που προτείνετε και της αγοράς με δάνειο, και θα ήθελα να συζητήσουμε ορισμένα σημεία.\n\n'+
+'═══════════════════════════════════════════════════════════\n'+
+'📊 ΣΥΝΟΠΤΙΚΑ ΑΠΟΤΕΛΕΣΜΑΤΑ\n'+
+'═══════════════════════════════════════════════════════════\n\n'+
+(d.winner==='loan'?'✅ Η Αγορά με Δάνειο είναι πιο συμφέρουσα':
+d.winner==='leasing'?'🔴 Το Leasing είναι πιο συμφέρον':
+'⚖️ Οριακή διαφορά μεταξύ των δύο επιλογών')+'\n\n'+
+'Διαφορά κόστους: '+euro(Math.abs(d.difference))+' σε 5 έτη ('+euro(Math.abs(d.difference)/5)+'/έτος)\n\n'+
+'═══════════════════════════════════════════════════════════\n'+
+'📋 ΑΝΑΛΥΤΙΚΗ ΣΥΓΚΡΙΣΗ ΚΟΣΤΟΥΣ\n'+
+'═══════════════════════════════════════════════════════════\n\n'+
+'🔷 LEASING (Καθαρό Κόστος: '+euro(d.netCostLeasing)+')\n'+
+'───────────────────────────────────────────────────────────\n'+
+'• Μηνιαίο μίσθωμα: '+euro(d.monthlyPayment)+' × '+d.durationMonths+' μήνες = '+euro(d.totalLeasingPayments)+'\n'+
+'• Προκαταβολή: '+euro(d.downPaymentLeasing)+'\n'+
+'• Τιμή εξαγοράς (buyout): '+euro(d.buyoutPrice)+'\n'+
+'• Σύνολο απόκτησης: '+euro(d.leasingAcquisitionCost)+'\n'+
+'• Μείον: Φορολογικό όφελος '+euro(d.taxBenefitLeasing)+'\n'+
+'• = ΚΑΘΑΡΟ ΚΟΣΤΟΣ: '+euro(d.netCostLeasing)+'\n\n'+
+'🔷 ΑΓΟΡΑ ΜΕ ΔΑΝΕΙΟ (Καθαρό Κόστος: '+euro(d.netCostLoan)+')\n'+
+'───────────────────────────────────────────────────────────\n'+
+'• Προκαταβολή: '+euro(d.downPaymentLoan)+'\n'+
+'• Ποσό δανείου: '+euro(d.loanAmount)+'\n'+
+'• Επιτόκιο: '+d.loanInterest+'%\n'+
+'• Μηνιαία δόση: '+euro(d.monthlyLoanPayment)+' × '+d.loanDuration+' μήνες\n'+
+'• Σύνολο δόσεων: '+euro(d.totalLoanPayments)+'\n'+
+'• Σύνολο τόκων: '+euro(d.totalInterestPaid)+'\n'+
+'• Έξοδα ασφάλειας (5ετία): '+euro(d.insuranceTotal)+'\n'+
+'• Έξοδα service (5ετία): '+euro(d.serviceTotal)+'\n'+
+'• Σύνολο εξόδων: '+euro(d.totalLoanCosts)+'\n'+
+'• Μείον: Φορολογικό όφελος '+euro(d.taxBenefitLoan)+'\n'+
+'  - Αποσβέσεις: '+euro(d.totalDepreciation5y)+'\n'+
+'  - Τόκοι δανείου: '+euro(d.totalInterestPaid)+'\n'+
+'• = ΚΑΘΑΡΟ ΚΟΣΤΟΣ: '+euro(d.netCostLoan)+'\n\n'+
+'═══════════════════════════════════════════════════════════\n'+
+'⚠️ ΚΡΙΣΙΜΗ ΠΑΡΑΤΗΡΗΣΗ: ΤΙΜΗ ΕΞΑΓΟΡΑΣ\n'+
+'═══════════════════════════════════════════════════════════\n\n'+
+'Η τιμή εξαγοράς που προτείνετε ('+euro(d.buyoutPrice)+') χρήζει αναθεώρησης:\n\n'+
+'📈 Εκτιμώμενη Αγοραία Αξία οχήματος μετά από '+d.residualYears+' έτη:\n'+
+'   '+euro(d.estimatedResidualValue)+' ('+pct(d.estimatedResidualPercentage)+' της αρχικής αξίας)\n\n'+
+'📉 Αξιολόγηση τρέχουσας τιμής εξαγοράς:\n'+
+'   '+buyoutAssessment+'\n\n'+
+'💰 Ανάλυση διαφοράς:\n'+
+'   Τιμή εξαγοράς: '+euro(d.buyoutPrice)+'\n'+
+'   Εκτιμώμενη αξία: '+euro(d.estimatedResidualValue)+'\n'+
+(isBuyoutHigh?
+'   🔴 Υπέρβαση: '+euro(buyoutVsMarket)+' ('+pct(buyoutPremium)+' υψηλότερα)\n\n'+
+'⚠️ Η υψηλή τιμή εξαγοράς επηρεάζει σημαντικά το συνολικό κόστος του leasing.\n'+
+'Αν η τιμή εξαγοράς ήταν κοντά στην εκτιμώμενη αγοραία αξία ('+euro(d.estimatedResidualValue)+'),\n'+
+'το καθαρό κόστος leasing θα μειωνόταν κατά περίπου '+euro(buyoutVsMarket)+'.':
+'   🟢 Η τιμή είναι λογική')+'\n\n'+
+'═══════════════════════════════════════════════════════════\n'+
+'📋 ΑΙΤΗΜΑΤΑ ΠΡΟΣ ΣΥΖΗΤΗΣΗ\n'+
+'═══════════════════════════════════════════════════════════\n\n'+
+'Βάσει της παραπάνω ανάλυσης, παρακαλώ για τα εξής:\n\n'+
+'1️⃣ ΑΝΑΘΕΩΡΗΣΗ ΤΙΜΗΣ ΕΞΑΓΟΡΑΣ\n'+
+(isBuyoutHigh?
+'   • Προτείνω μείωση της τιμής εξαγοράς από '+euro(d.buyoutPrice)+' σε '+euro(Math.round(d.estimatedResidualValue*1.05))+'\n'+
+'     (προσαύξηση 5% επί της εκτιμώμενης αξίας για το κέρδος της εταιρείας)\n'+
+'   • Εναλλακτικά, προτείνω τιμή εξαγοράς: '+euro(Math.round(d.buyoutPrice*0.85))+' (έκπτωση 15%)':
+'   • Η τιμή εξαγοράς είναι λογική, παραμένω στο αρχικό ποσό')+'\n\n'+
+'2️⃣ ΕΝΑΛΛΑΚΤΙΚΑ ΣΕΝΑΡΙΑ LEASING\n'+
+'   • Επέκταση διάρκειας leasing από '+d.durationMonths+' σε '+(d.durationMonths+12)+' μήνες με χαμηλότερη τιμή εξαγοράς\n'+
+'   • Μείωση μηνιαίου μισθώματος με αύξηση προκαταβολής\n'+
+'   • Πρόγραμμα με επιστροφή του οχήματος (χωρίς εξαγορά)\n\n'+
+'3️⃣ ΣΥΓΚΡΙΤΙΚΗ ΠΡΟΣΦΟΡΑ\n'+
+'   • Παρακαλώ για εναλλακτική προσφορά με βελτιωμένους όρους\n'+
+'   • Ενδεικτικά: Μείωση μισθώματος ή/και τιμής εξαγοράς για να καταστεί\n'+
+'     το leasing ανταγωνιστικό έναντι της αγοράς με δάνειο\n\n'+
+'═══════════════════════════════════════════════════════════\n'+
+'📊 ΦΟΡΟΛΟΓΙΚΑ ΟΦΕΛΗ (για ενημέρωση)\n'+
+'═══════════════════════════════════════════════════════════\n\n'+
+'Leasing:\n'+
+'• Ετήσια έκπτωση: '+euro(d.taxBenefitLeasing/(d.durationMonths/12))+'/έτος\n'+
+'• Σύνολο 5ετίας: '+euro(d.taxBenefitLeasing)+'\n\n'+
+'Αγορά με Δάνειο:\n'+
+'• Αποσβέσεις: '+euro(d.annualDepreciation)+'/έτος\n'+
+'• Τόκοι δανείου: '+euro(d.totalInterestPaid)+'\n'+
+'• Σύνολο εκπιπτέων: '+euro(d.totalLoanDeduction)+'\n'+
+'• Φορολογικό όφελος: '+euro(d.taxBenefitLoan)+'\n\n'+
+'═══════════════════════════════════════════════════════════\n\n'+
+'Παρακαλώ επικοινωνήστε μαζί μου για να συζητήσουμε τις παραπάνω παρατηρήσεις και να καταλήξουμε στη βέλτιστη λύση.\n\n'+
+'Είμαι στη διάθεσή σας για οποιαδήποτε διευκρίνιση.\n\n'+
+'Με εκτίμηση,\n'+clientName+'\n\n'+
+'---\n📎 Συνημμένα: Οικονομική ανάλυση Excel (κατόπιν αιτήματος)\n📞 Τηλέφωνο επικοινωνίας: [συμπληρώστε]\n📧 Email: [συμπληρώστε]';
 
-var email = `Θέμα: Αίτημα Αναθεώρησης Προσφοράς Leasing & Σύγκριση Κόστους Αυτοκινήτου
-
-Αξιότιμοι κύριοι/κυρίες της ${companyName},
-
-Σας ευχαριστώ για την προσφορά σας. Πραγματοποίησα λεπτομερή οικονομική ανάλυση σύγκρισης μεταξύ του leasing που προτείνετε και της αγοράς με δάνειο, και θα ήθελα να συζητήσουμε ορισμένα σημεία.
-
-═══════════════════════════════════════════════════════════
-📊 ΣΥΝΟΠΤΙΚΑ ΑΠΟΤΕΛΕΣΜΑΤΑ
-═══════════════════════════════════════════════════════════
-
-${d.winner === 'loan' ? '✅ Η Αγορά με Δάνειο είναι πιο συμφέρουσα' : 
-  d.winner === 'leasing' ? '🔴 Το Leasing είναι πιο συμφέρον' : 
-  '⚖️ Οριακή διαφορά μεταξύ των δύο επιλογών'}
-
-Διαφορά κόστους: ${euro(Math.abs(d.difference))} σε 5 έτη (${euro(Math.abs(d.difference)/5)}/έτος)
-
-═══════════════════════════════════════════════════════════
-📋 ΑΝΑΛΥΤΙΚΗ ΣΥΓΚΡΙΣΗ ΚΟΣΤΟΥΣ
-═══════════════════════════════════════════════════════════
-
-🔷 LEASING (Καθαρό Κόστος: ${euro(d.netCostLeasing)})
-───────────────────────────────────────────────────────────
-• Μηνιαίο μίσθωμα: ${euro(d.monthlyPayment)} × ${d.durationMonths} μήνες = ${euro(d.totalLeasingPayments)}
-• Προκαταβολή: ${euro(d.downPaymentLeasing)}
-• Τιμή εξαγοράς (buyout): ${euro(d.buyoutPrice)}
-• Σύνολο απόκτησης: ${euro(d.leasingAcquisitionCost)}
-• Μείον: Φορολογικό όφελος ${euro(d.taxBenefitLeasing)}
-• = ΚΑΘΑΡΟ ΚΟΣΤΟΣ: ${euro(d.netCostLeasing)}
-
-🔷 ΑΓΟΡΑ ΜΕ ΔΑΝΕΙΟ (Καθαρό Κόστος: ${euro(d.netCostLoan)})
-───────────────────────────────────────────────────────────
-• Προκαταβολή: ${euro(d.downPaymentLoan)}
-• Ποσό δανείου: ${euro(d.loanAmount)}
-• Επιτόκιο: ${d.loanInterest}%
-• Μηνιαία δόση: ${euro(d.monthlyLoanPayment)} × ${d.loanDuration} μήνες
-• Σύνολο δόσεων: ${euro(d.totalLoanPayments)}
-• Σύνολο τόκων: ${euro(d.totalInterestPaid)}
-• Έξοδα ασφάλειας (5ετία): ${euro(d.insuranceTotal)}
-• Έξοδα service (5ετία): ${euro(d.serviceTotal)}
-• Σύνολο εξόδων: ${euro(d.totalLoanCosts)}
-• Μείον: Φορολογικό όφελος ${euro(d.taxBenefitLoan)}
-  - Αποσβέσεις: ${euro(d.totalDepreciation5y)}
-  - Τόκοι δανείου: ${euro(d.totalInterestPaid)}
-• = ΚΑΘΑΡΟ ΚΟΣΤΟΣ: ${euro(d.netCostLoan)}
-
-═══════════════════════════════════════════════════════════
-⚠️ ΚΡΙΣΙΜΗ ΠΑΡΑΤΗΡΗΣΗ: ΤΙΜΗ ΕΞΑΓΟΡΑΣ
-═══════════════════════════════════════════════════════════
-
-Η τιμή εξαγοράς που προτείνετε (${euro(d.buyoutPrice)}) χρήζει αναθεώρησης:
-
-📈 Εκτιμώμενη Αγοραία Αξία οχήματος μετά από ${d.residualYears} έτη:
-   ${euro(d.estimatedResidualValue)} (${pct(d.estimatedResidualPercentage)} της αρχικής αξίας)
-
-📉 Αξιολόγηση τρέχουσας τιμής εξαγοράς:
-   ${buyoutAssessment}
-
-💰 Ανάλυση διαφοράς:
-   Τιμή εξαγοράς: ${euro(d.buyoutPrice)}
-   Εκτιμώμενη αξία: ${euro(d.estimatedResidualValue)}
-   ${isBuyoutHigh ? '🔴 Υπέρβαση: ' + euro(buyoutVsMarket) + ' (' + pct(buyoutPremium) + ' υψηλότερα)' : 
-     '🟢 Η τιμή είναι λογική'}
-
-${isBuyoutHigh ? `
-⚠️ Η υψηλή τιμή εξαγοράς επηρεάζει σημαντικά το συνολικό κόστος του leasing.
-Αν η τιμή εξαγοράς ήταν κοντά στην εκτιμώμενη αγοραία αξία (${euro(d.estimatedResidualValue)}),
-το καθαρό κόστος leasing θα μειωνόταν κατά περίπου ${euro(buyoutVsMarket)}.` : ''}
-
-═══════════════════════════════════════════════════════════
-📋 ΑΙΤΗΜΑΤΑ ΠΡΟΣ ΣΥΖΗΤΗΣΗ
-═══════════════════════════════════════════════════════════
-
-Βάσει της παραπάνω ανάλυσης, παρακαλώ για τα εξής:
-
-1️⃣ ΑΝΑΘΕΩΡΗΣΗ ΤΙΜΗΣ ΕΞΑΓΟΡΑΣ
-   ${isBuyoutHigh ? 
-   `• Προτείνω μείωση της τιμής εξαγοράς από ${euro(d.buyoutPrice)} σε ${euro(Math.round(d.estimatedResidualValue * 1.05))} 
-     (προσαύξηση 5% επί της εκτιμώμενης αξίας για το κέρδος της εταιρείας)
-   • Εναλλακτικά, προτείνω τιμή εξαγοράς: ${euro(Math.round(d.buyoutPrice * 0.85))} (έκπτωση 15%)` : 
-   `• Η τιμή εξαγοράς είναι λογική, παραμένω στο αρχικό ποσό`}
-
-2️⃣ ΕΝΑΛΛΑΚΤΙΚΑ ΣΕΝΑΡΙΑ LEASING
-   • Επέκταση διάρκειας leasing από ${d.durationMonths} σε ${d.durationMonths + 12} μήνες με χαμηλότερη τιμή εξαγοράς
-   • Μείωση μηνιαίου μισθώματος με αύξηση προκαταβολής
-   • Πρόγραμμα με επιστροφή του οχήματος (χωρίς εξαγορά)
-
-3️⃣ ΣΥΓΚΡΙΤΙΚΗ ΠΡΟΣΦΟΡΑ
-   • Παρακαλώ για εναλλακτική προσφορά με βελτιωμένους όρους
-   • Ενδεικτικά: Μείωση μισθώματος ή/και τιμής εξαγοράς για να καταστεί 
-     το leasing ανταγωνιστικό έναντι της αγοράς με δάνειο
-
-═══════════════════════════════════════════════════════════
-📊 ΦΟΡΟΛΟΓΙΚΑ ΟΦΕΛΗ (για ενημέρωση)
-═══════════════════════════════════════════════════════════
-
-Leasing:
-• Ετήσια έκπτωση: ${euro(d.taxBenefitLeasing / (d.durationMonths/12))}/έτος
-• Σύνολο 5ετίας: ${euro(d.taxBenefitLeasing)}
-
-Αγορά με Δάνειο:
-• Αποσβέσεις: ${euro(d.annualDepreciation)}/έτος
-• Τόκοι δανείου: ${euro(d.totalInterestPaid)}
-• Σύνολο εκπιπτέων: ${euro(d.totalLoanDeduction)}
-• Φορολογικό όφελος: ${euro(d.taxBenefitLoan)}
-
-═══════════════════════════════════════════════════════════
-
-Παρακαλώ επικοινωνήστε μαζί μου για να συζητήσουμε τις παραπάνω παρατηρήσεις και να καταλήξουμε στη βέλτιστη λύση.
-
-Είμαι στη διάθεσή σας για οποιαδήποτε διευκρίνιση.
-
-Με εκτίμηση,
-${clientName}
-
----
-📎 Συνημμένα: Οικονομική ανάλυση Excel (κατόπιν αιτήματος)
-📞 Τηλέφωνο επικοινωνίας: [συμπληρώστε]
-📧 Email: [συμπληρώστε]`;
-
-    document.getElementById('emailText').value = email;
+document.getElementById('emailText').value=email;
 }
 
 function copyEmail(){
