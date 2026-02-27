@@ -556,7 +556,7 @@
                 if (daysFull === 0) daysFull = db / ppy;
                 let frac = daysToNext / daysFull;
                 
-                let ytm = calcYTM(mv, fv, cp, future.length, ppy, frac);
+                let ytm = calcYTM(dirty, fv, cp, future.length, ppy, frac);
 
                 // Υπολογισμός ΣΥΝΟΛΩΝ
                 let totalCoupons = cp * future.length;
@@ -621,7 +621,7 @@
                     pv += cf / Math.pow(1 + r, i + frac);
                 }
                 document.getElementById('r-pv').textContent = '€' + fmt(pv);
-                document.getElementById('r-diff').textContent = '€' + fmt(Math.abs(pv - mv));
+                document.getElementById('r-diff').textContent = '€' + fmt(Math.abs(pv - dirty));
 
                 document.getElementById('res').classList.add('show');
                 document.getElementById('res').scrollIntoView({ behavior: 'smooth' });
@@ -716,3 +716,4 @@
     </script>
 </body>
 </html>
+
