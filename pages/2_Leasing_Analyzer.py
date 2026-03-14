@@ -717,8 +717,8 @@ document.getElementById('calcLeasingVatDetail').textContent=usageType==='ix'?'Ι
 var enhDiv=document.getElementById('calcEnhancementStep');
 if(isElectric){
 enhDiv.style.display='block';
-var portion50=annualPaymentNet*enhancement50pct;
-var portion25=annualPaymentNet*enhancement25pct;
+var portion50=annualBaseLeasing*enhancement50pct;
+var portion25=annualBaseLeasing*enhancement25pct;
 document.getElementById('calcEnhancementDetail').innerHTML='ΛΤΠΦ = '+euro(ltvp)+' (> €40.000, οπότε χωρίζεται σε δύο κλιμάκια)<br><br><strong>Κλιμάκιο 50%:</strong><br>Ποσοστό: '+pct(enhancement50pct*100)+' του μισθώματος<br>Ποσό: '+euro(annualPaymentNet)+' × '+pct(enhancement50pct*100)+' = '+euro(portion50)+'<br>Προσαύξηση: '+euro(portion50)+' × 50% = <strong>'+euro(annualEnhancement50)+'</strong><br><br><strong>Κλιμάκιο 25%:</strong><br>Ποσοστό: '+pct(enhancement25pct*100)+' του μισθώματος<br>Ποσό: '+euro(annualPaymentNet)+' × '+pct(enhancement25pct*100)+' = '+euro(portion25)+'<br>Προσαύξηση: '+euro(portion25)+' × 25% = <strong>'+euro(annualEnhancement25)+'</strong>';
 }else{enhDiv.style.display='none';}
 
