@@ -1,0 +1,1268 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>📊 Υπολογιστής Ομολόγων Pro v6</title>
+
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📊</text></svg>">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1220px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            color: white;
+        }
+
+        .logo {
+            font-size: 4rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        h1 {
+            font-size: 2.4rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .subtitle {
+            font-size: 1.05rem;
+            opacity: 0.92;
+        }
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            margin: 20px 0;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.18);
+        }
+
+        .card h2 {
+            color: #1a237e;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #37474f;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            font-family: 'Courier New', monospace;
+            transition: all 0.25s ease;
+            background: white;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102,126,234,0.12);
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 50px;
+            font-size: 18px;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            display: block;
+            margin: 30px auto 0;
+            box-shadow: 0 4px 15px rgba(102,126,234,0.35);
+            transition: all 0.2s ease;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102,126,234,0.45);
+        }
+
+        .results {
+            display: none;
+        }
+
+        .results.show {
+            display: block;
+        }
+
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: #f5f7fa;
+            margin: 10px 0;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+            gap: 20px;
+        }
+
+        .result-row.highlight {
+            background: linear-gradient(135deg, #e8eaf6 0%, #c5cae9 100%);
+            border-left-color: #ff6f00;
+        }
+
+        .result-row.total {
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            border-left-color: #28a745;
+            font-weight: 700;
+        }
+
+        .result-row.premium {
+            background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+            border-left-color: #ef6c00;
+        }
+
+        .result-row.discount {
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+            border-left-color: #2e7d32;
+        }
+
+        .result-row.par {
+            background: linear-gradient(135deg, #eceff1 0%, #cfd8dc 100%);
+            border-left-color: #546e7a;
+        }
+
+        .result-label {
+            font-weight: 600;
+            color: #37474f;
+        }
+
+        .result-value {
+            font-weight: 700;
+            color: #1a237e;
+            font-family: 'Courier New', monospace;
+            font-size: 1.05rem;
+            text-align: right;
+        }
+
+        .info {
+            background: #e3f2fd;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 20px;
+        }
+
+        .summary-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 20px;
+            border-radius: 0 8px 8px 0;
+            margin: 20px 0;
+        }
+
+        .summary-box h3 {
+            color: #856404;
+            margin-bottom: 15px;
+        }
+
+        .verification {
+            background: #e8f5e9;
+            border-left: 4px solid #4caf50;
+            padding: 15px;
+            border-radius: 0 8px 8px 0;
+            margin-top: 20px;
+            line-height: 1.8;
+        }
+
+        .explain-box {
+            background: #f3e5f5;
+            border-left: 4px solid #8e24aa;
+            padding: 18px;
+            border-radius: 0 8px 8px 0;
+            margin: 20px 0;
+            line-height: 1.8;
+            color: #4a148c;
+        }
+
+        .override-box {
+            background: #fff8e1;
+            border-left: 4px solid #ffb300;
+            padding: 18px;
+            border-radius: 0 8px 8px 0;
+            margin-top: 10px;
+        }
+
+        .btn-export {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            margin-top: 20px;
+        }
+
+        .mini-note {
+            margin-top: 10px;
+            font-size: 0.92rem;
+            color: #546e7a;
+        }
+
+        .pill {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 6px 10px;
+            background: #eef2ff;
+            color: #3949ab;
+            border-radius: 999px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            font-size: 0.95rem;
+        }
+
+        th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        tr:hover {
+            background: #f5f7fa;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .logo {
+                font-size: 3rem;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .result-row {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .result-value {
+                text-align: left;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">📊</div>
+            <h1>Υπολογιστής Ομολόγων Pro v6</h1>
+            <p class="subtitle">YTM, accrued interest, clean/dirty input, amount/% of par, premium-discount, manual override</p>
+        </header>
+
+        <div class="info">
+            💡 Η v6 προσθέτει <strong>manual override</strong> για Last Coupon Date, Next Coupon Date και Accrued Days.
+            <div class="mini-note">
+                Χρήσιμο όταν το bank advice έχει ειδικό stub period ή διαφορετικό settlement logic.
+            </div>
+            <div class="pill">30/360 • ACT/360 • ACT/365 • Clean/Dirty • Amount/% of Par • Manual Override</div>
+        </div>
+
+        <div class="card">
+            <h2>📋 Στοιχεία Ομολόγου</h2>
+
+            <div class="form-row">
+                <div>
+                    <label>Nominal Value / Ονομαστική Αξία *</label>
+                    <input type="text" id="fv" placeholder="2.000.000,00">
+                </div>
+                <div>
+                    <label>Input Price / Τιμή Εισόδου *</label>
+                    <input type="text" id="priceInput" placeholder="2.027.680,00 ή 101,3840">
+                </div>
+                <div>
+                    <label>Coupon Rate (%) *</label>
+                    <input type="text" id="cr" placeholder="4,805">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div>
+                    <label>Input Price Mode *</label>
+                    <select id="priceMode">
+                        <option value="amount">Amount</option>
+                        <option value="percent">Percent of Par (%)</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Input Price Type *</label>
+                    <select id="priceType">
+                        <option value="clean">Clean Price</option>
+                        <option value="dirty">Dirty Price</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Συχνότητα Πληρωμών / Payment Frequency *</label>
+                    <select id="fr">
+                        <option value="12">Ετήσια (12 μήνες)</option>
+                        <option value="6">Εξαμηνιαία (6 μήνες)</option>
+                        <option value="4">Τετραμηνιαία (4 μήνες)</option>
+                        <option value="3">Τριμηνιαία (3 μήνες)</option>
+                        <option value="1">Μηνιαία (1 μήνα)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div>
+                    <label>Day Count Convention *</label>
+                    <select id="dc">
+                        <option value="30/360">30/360</option>
+                        <option value="ACT/360">ACT/360</option>
+                        <option value="ACT/365">ACT/365</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Issue Day / Ημερομηνία Έκδοσης *</label>
+                    <input type="date" id="id">
+                </div>
+                <div>
+                    <label>Value Day / Ημερομηνία Αγοράς *</label>
+                    <input type="date" id="vd">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div>
+                    <label>Maturity Day / Ημερομηνία Λήξης *</label>
+                    <input type="date" id="md">
+                </div>
+                <div>
+                    <label>Manual Override?</label>
+                    <select id="manualOverride">
+                        <option value="off">OFF</option>
+                        <option value="on">ON</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="overridePanel" class="override-box hidden">
+                <div class="form-row">
+                    <div>
+                        <label>Manual Last Coupon Date</label>
+                        <input type="date" id="manualLastCoupon">
+                    </div>
+                    <div>
+                        <label>Manual Next Coupon Date</label>
+                        <input type="date" id="manualNextCoupon">
+                    </div>
+                    <div>
+                        <label>Manual Accrued Days</label>
+                        <input type="text" id="manualAccruedDays" placeholder="π.χ. 161">
+                    </div>
+                </div>
+                <div class="mini-note">
+                    Αν βάλεις Manual Accrued Days, υπερισχύει του ημερολογιακού υπολογισμού.
+                </div>
+            </div>
+
+            <button onclick="calculate()">🔍 Υπολογισμός</button>
+        </div>
+
+        <div id="res" class="card results">
+            <h2>📈 Αποτελέσματα</h2>
+
+            <div class="result-row highlight">
+                <span class="result-label">YTM (Yield to Maturity)</span>
+                <span id="r-ytm" class="result-value">-</span>
+            </div>
+
+            <div class="result-row">
+                <span class="result-label">Price Mode Used</span>
+                <span id="r-pricemode" class="result-value">-</span>
+            </div>
+
+            <div class="result-row">
+                <span class="result-label">Price Type Used</span>
+                <span id="r-pricetype" class="result-value">-</span>
+            </div>
+
+            <div class="result-row">
+                <span class="result-label">Manual Override Used</span>
+                <span id="r-override-used" class="result-value">-</span>
+            </div>
+
+            <div class="result-row">
+                <span class="result-label">Input Price (Raw)</span>
+                <span id="r-inputprice-raw" class="result-value">-</span>
+            </div>
+
+            <div class="result-row">
+                <span class="result-label">Input Price as Amount</span>
+                <span id="r-inputprice-amount" class="result-value">-</span>
+            </div>
+
+            <div class="result-row">
+                <span class="result-label">Input Price as % of Par</span>
+                <span id="r-inputprice-pct" class="result-value">-</span>
+            </div>
+
+            <div class="result-row">
+                <span class="result-label">Nominal Value / Ονομαστική Αξία</span>
+                <span id="r-nominal" class="result-value">-</span>
+            </div>
+
+            <div class="result-row">
+                <span class="result-label">Clean Price / Καθαρή Τιμή</span>
+                <span id="r-clean" class="result-value">-</span>
+            </div>
+
+            <div class="result-row">
+                <span class="result-label">Clean Price as % of Par</span>
+                <span id="r-clean-pct" class="result-value">-</span>
+            </div>
+
+            <div class="result-row">
+                <span class="result-label">Accrued Interest / Δεδουλευμένοι Τόκοι</span>
+                <span id="r-acc" class="result-value">-</span>
+            </div>
+
+            <div class="result-row">
+                <span class="result-label">Dirty Price / Μικτή Τιμή</span>
+                <span id="r-dirty" class="result-value">-</span>
+            </div>
+
+            <div class="result-row">
+                <span class="result-label">Dirty Price as % of Par</span>
+                <span id="r-dirty-pct" class="result-value">-</span>
+            </div>
+
+            <div id="r-status-row" class="result-row">
+                <span class="result-label">Bond Purchase Status</span>
+                <span id="r-status" class="result-value">-</span>
+            </div>
+
+            <div class="result-row">
+                <span class="result-label">Premium / Discount Amount vs Nominal</span>
+                <span id="r-premdisc-amt" class="result-value">-</span>
+            </div>
+
+            <div class="result-row">
+                <span class="result-label">Premium / Discount % vs Nominal</span>
+                <span id="r-premdisc-pct" class="result-value">-</span>
+            </div>
+
+            <div class="result-row">
+                <span class="result-label">Accrued Days / Ημέρες Δεδουλευμένων</span>
+                <span id="r-days" class="result-value">-</span>
+            </div>
+
+            <div class="result-row">
+                <span class="result-label">Annual Coupon / Ετήσιο Κουπόνι</span>
+                <span id="r-ann" class="result-value">-</span>
+            </div>
+
+            <div class="result-row">
+                <span class="result-label">Coupon per Period / Κουπόνι ανά Περίοδο</span>
+                <span id="r-cp" class="result-value">-</span>
+            </div>
+
+            <div class="result-row">
+                <span class="result-label">Convention</span>
+                <span id="r-conv" class="result-value">-</span>
+            </div>
+
+            <div class="result-row">
+                <span class="result-label">Last Coupon Date / Τελευταίο Κουπόνι</span>
+                <span id="r-lastc" class="result-value">-</span>
+            </div>
+
+            <div class="result-row">
+                <span class="result-label">Next Coupon Date / Επόμενο Κουπόνι</span>
+                <span id="r-nextc" class="result-value">-</span>
+            </div>
+
+            <div class="result-row">
+                <span class="result-label">Full Coupon Period Days / Ημέρες Πλήρους Περιόδου</span>
+                <span id="r-fulldays" class="result-value">-</span>
+            </div>
+
+            <div class="result-row">
+                <span class="result-label">Days to Next Coupon / Ημέρες έως το Επόμενο Κουπόνι</span>
+                <span id="r-daystonext" class="result-value">-</span>
+            </div>
+
+            <div class="result-row">
+                <span class="result-label">Bond Duration (Value → Maturity)</span>
+                <span id="r-duration" class="result-value">-</span>
+            </div>
+
+            <div class="explain-box">
+                <strong>Ερμηνεία</strong><br>
+                <span id="r-explain-line1">-</span><br>
+                <span id="r-explain-line2">-</span><br>
+                <span id="r-explain-line3">-</span>
+            </div>
+
+            <div class="summary-box">
+                <h3>📊 Συνολικές Ταμειακές Ροές</h3>
+
+                <div class="result-row">
+                    <span class="result-label">Total Coupons / Σύνολο Κουπονιών</span>
+                    <span id="r-tot-coup" class="result-value">-</span>
+                </div>
+
+                <div class="result-row">
+                    <span class="result-label">Principal Repayment / Κεφάλαιο Λήξης</span>
+                    <span id="r-cap" class="result-value">-</span>
+                </div>
+
+                <div class="result-row total">
+                    <span class="result-label">Total Cash Flows / Συνολικές Εισπράξεις</span>
+                    <span id="r-tot-all" class="result-value">-</span>
+                </div>
+
+                <div class="result-row">
+                    <span class="result-label">Dirty Cost / Κόστος Αγοράς για YTM</span>
+                    <span id="r-dirty-cost" class="result-value">-</span>
+                </div>
+
+                <div class="result-row total">
+                    <span class="result-label">Profit / Loss at Maturity / Κέρδος-Ζημία στη Λήξη</span>
+                    <span id="r-profit" class="result-value">-</span>
+                </div>
+            </div>
+
+            <h3 style="margin-top: 25px; color: #37474f;">💰 Αναλυτικές Ταμειακές Ροές</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Περίοδος</th>
+                        <th>Ημερομηνία</th>
+                        <th>Ημέρες</th>
+                        <th>Κουπόνι</th>
+                        <th>Κεφάλαιο</th>
+                        <th>Σύνολο</th>
+                    </tr>
+                </thead>
+                <tbody id="tb"></tbody>
+            </table>
+
+            <div class="verification">
+                <strong>✓ Επαλήθευση</strong><br>
+                Παρούσα Αξία από YTM: <span id="r-pv">-</span><br>
+                Διαφορά από Dirty Price: <span id="r-diff">-</span>
+            </div>
+
+            <button class="btn-export" onclick="exportTXT()">📄 Εξαγωγή TXT</button>
+        </div>
+    </div>
+
+    <script>
+        function fmt(num) {
+            const n = Number(num);
+            if (isNaN(n)) return '0,00';
+
+            const sign = n < 0 ? '-' : '';
+            const abs = Math.abs(n);
+            const parts = abs.toFixed(2).split('.');
+            let intPart = parts[0];
+            const decPart = parts[1];
+
+            let out = '';
+            let count = 0;
+            for (let i = intPart.length - 1; i >= 0; i--) {
+                out = intPart[i] + out;
+                count++;
+                if (count === 3 && i > 0) {
+                    out = '.' + out;
+                    count = 0;
+                }
+            }
+            return sign + out + ',' + decPart;
+        }
+
+        function fmtPct(num, decimals = 4) {
+            const n = Number(num);
+            if (isNaN(n)) return '0,0000%';
+            return n.toFixed(decimals).replace('.', ',') + '%';
+        }
+
+        function fmtDate(d) {
+            if (!(d instanceof Date) || isNaN(d.getTime())) return '';
+            return String(d.getDate()).padStart(2, '0') + '/' +
+                   String(d.getMonth() + 1).padStart(2, '0') + '/' +
+                   d.getFullYear();
+        }
+
+        function parseGreekNumber(str) {
+            if (!str) return 0;
+            return parseFloat(String(str).replace(/\./g, '').replace(',', '.'));
+        }
+
+        function toDateAtNoon(dateStr) {
+            if (!dateStr) return null;
+            const d = new Date(dateStr + 'T12:00:00');
+            return isNaN(d.getTime()) ? null : d;
+        }
+
+        function actualDays(start, end) {
+            return Math.round((end - start) / 86400000);
+        }
+
+        function isLastDayOfFebruary(date) {
+            if (date.getMonth() !== 1) return false;
+            const lastDay = new Date(date.getFullYear(), 2, 0).getDate();
+            return date.getDate() === lastDay;
+        }
+
+        function days360US(start, end) {
+            let d1 = start.getDate();
+            let m1 = start.getMonth() + 1;
+            let y1 = start.getFullYear();
+
+            let d2 = end.getDate();
+            let m2 = end.getMonth() + 1;
+            let y2 = end.getFullYear();
+
+            if (d1 === 31 || isLastDayOfFebruary(start)) d1 = 30;
+            if (d2 === 31 && d1 >= 30) d2 = 30;
+            if (isLastDayOfFebruary(end) && d1 >= 30) d2 = 30;
+
+            return (y2 - y1) * 360 + (m2 - m1) * 30 + (d2 - d1);
+        }
+
+        function getDayCountDays(start, end, convention) {
+            if (convention === '30/360') return days360US(start, end);
+            return actualDays(start, end);
+        }
+
+        function getDayCountBase(convention) {
+            if (convention === 'ACT/365') return 365;
+            return 360;
+        }
+
+        function daysInMonth(year, monthIndex) {
+            return new Date(year, monthIndex + 1, 0).getDate();
+        }
+
+        function addMonthsKeepingEOM(date, monthsToAdd) {
+            const original = new Date(date.getTime());
+            const originalDay = original.getDate();
+            const originalMonth = original.getMonth();
+            const originalYear = original.getFullYear();
+
+            const isEOM = originalDay === daysInMonth(originalYear, originalMonth);
+
+            let y = originalYear;
+            let m = originalMonth + monthsToAdd;
+
+            y += Math.floor(m / 12);
+            m = ((m % 12) + 12) % 12;
+
+            const lastDayNewMonth = daysInMonth(y, m);
+            const newDay = isEOM ? lastDayNewMonth : Math.min(originalDay, lastDayNewMonth);
+
+            return new Date(y, m, newDay, 12, 0, 0, 0);
+        }
+
+        function diffYMD(start, end) {
+            let d1 = new Date(start.getTime());
+            let d2 = new Date(end.getTime());
+
+            let years = d2.getFullYear() - d1.getFullYear();
+            let months = d2.getMonth() - d1.getMonth();
+            let days = d2.getDate() - d1.getDate();
+
+            if (days < 0) {
+                months--;
+                const prevMonthLastDay = new Date(d2.getFullYear(), d2.getMonth(), 0).getDate();
+                days += prevMonthLastDay;
+            }
+
+            if (months < 0) {
+                years--;
+                months += 12;
+            }
+
+            const totalYears = actualDays(d1, d2) / 365.25;
+            return { years, months, days, totalYears };
+        }
+
+        function attachGreekFormatter(id) {
+            document.getElementById(id).addEventListener('blur', function () {
+                const priceModeEl = document.getElementById('priceMode');
+                const mode = priceModeEl ? priceModeEl.value : 'amount';
+                const val = this.value.trim().replace(/\s/g, '');
+                if (!val) return;
+
+                const clean = val.replace(/\./g, '').replace(',', '.');
+                const num = parseFloat(clean);
+                if (isNaN(num)) return;
+
+                if (id === 'priceInput' && mode === 'percent') {
+                    this.value = num.toFixed(4).replace('.', ',');
+                } else {
+                    this.value = fmt(num);
+                }
+            });
+        }
+
+        attachGreekFormatter('fv');
+        attachGreekFormatter('priceInput');
+
+        document.getElementById('priceMode').addEventListener('change', function () {
+            const input = document.getElementById('priceInput');
+            const val = input.value.trim();
+            if (!val) return;
+
+            const num = parseGreekNumber(val);
+            if (isNaN(num)) return;
+
+            if (this.value === 'percent') {
+                input.value = num.toFixed(4).replace('.', ',');
+            } else {
+                input.value = fmt(num);
+            }
+        });
+
+        document.getElementById('manualOverride').addEventListener('change', function () {
+            const panel = document.getElementById('overridePanel');
+            if (this.value === 'on') {
+                panel.classList.remove('hidden');
+            } else {
+                panel.classList.add('hidden');
+            }
+        });
+
+        function buildCouponSchedule(issueDate, maturityDate, freqMonths) {
+            const schedule = [];
+            let current = new Date(maturityDate.getTime());
+
+            while (current > issueDate) {
+                schedule.unshift(new Date(current.getTime()));
+                current = addMonthsKeepingEOM(current, -freqMonths);
+            }
+
+            return schedule;
+        }
+
+        function findCouponWindow(issueDate, maturityDate, valueDate, freqMonths) {
+            const schedule = buildCouponSchedule(issueDate, maturityDate, freqMonths);
+
+            let lastCoupon = new Date(issueDate.getTime());
+            let nextCoupon = null;
+
+            for (const c of schedule) {
+                if (c <= valueDate) {
+                    lastCoupon = c;
+                } else {
+                    nextCoupon = c;
+                    break;
+                }
+            }
+
+            return { schedule, lastCoupon, nextCoupon };
+        }
+
+        function calcYTM(price, face, couponPerPeriod, periods, periodsPerYear, firstFrac) {
+            let r = 0.05 / periodsPerYear;
+
+            for (let i = 0; i < 100; i++) {
+                let f = 0;
+                let df = 0;
+
+                for (let t = 1; t <= periods; t++) {
+                    const exp = t - 1 + firstFrac;
+                    f += couponPerPeriod / Math.pow(1 + r, exp);
+                    df -= exp * couponPerPeriod / Math.pow(1 + r, exp + 1);
+                }
+
+                const expFace = periods - 1 + firstFrac;
+                f += face / Math.pow(1 + r, expFace);
+                df -= expFace * face / Math.pow(1 + r, expFace + 1);
+
+                f = f - price;
+
+                if (Math.abs(df) < 1e-12) break;
+
+                const rNew = r - f / df;
+                if (Math.abs(rNew - r) < 1e-12) {
+                    r = rNew;
+                    break;
+                }
+
+                r = Math.max(rNew, -0.99);
+            }
+
+            return r * periodsPerYear * 100;
+        }
+
+        function classifyPremiumDiscount(cleanPrice, nominalValue) {
+            const diff = cleanPrice - nominalValue;
+            const pct = nominalValue !== 0 ? (diff / nominalValue) * 100 : 0;
+            const eps = 0.000001;
+
+            let status = 'At Par';
+            if (diff > eps) status = 'At Premium';
+            if (diff < -eps) status = 'At Discount';
+
+            return { diff, pct, status };
+        }
+
+        function amountToPercentOfPar(amount, nominal) {
+            if (!nominal) return 0;
+            return (amount / nominal) * 100;
+        }
+
+        function percentOfParToAmount(percent, nominal) {
+            return (percent / 100) * nominal;
+        }
+
+        let lastCalc = null;
+
+        function calculate() {
+            try {
+                const fv = parseGreekNumber(document.getElementById('fv').value);
+                const inputPriceRaw = document.getElementById('priceInput').value.trim();
+                const inputPriceNumeric = parseGreekNumber(inputPriceRaw);
+                const cr = parseFloat(document.getElementById('cr').value.trim().replace(',', '.'));
+
+                const priceMode = document.getElementById('priceMode').value;
+                const priceType = document.getElementById('priceType').value;
+                const freqMonths = parseInt(document.getElementById('fr').value, 10);
+                const convention = document.getElementById('dc').value;
+                const manualOverride = document.getElementById('manualOverride').value;
+
+                const issueDate = toDateAtNoon(document.getElementById('id').value);
+                const valueDate = toDateAtNoon(document.getElementById('vd').value);
+                const maturityDate = toDateAtNoon(document.getElementById('md').value);
+
+                const manualLastCoupon = toDateAtNoon(document.getElementById('manualLastCoupon').value);
+                const manualNextCoupon = toDateAtNoon(document.getElementById('manualNextCoupon').value);
+                const manualAccruedDaysRaw = document.getElementById('manualAccruedDays').value.trim();
+                const manualAccruedDays = manualAccruedDaysRaw === '' ? null : parseInt(manualAccruedDaysRaw, 10);
+
+                if (!fv || !inputPriceNumeric || isNaN(cr)) {
+                    alert('Συμπληρώστε σωστά Nominal Value, Input Price και Coupon Rate.');
+                    return;
+                }
+
+                if (!issueDate || !valueDate || !maturityDate) {
+                    alert('Συμπληρώστε όλες τις ημερομηνίες.');
+                    return;
+                }
+
+                if (maturityDate <= issueDate) {
+                    alert('Η ημερομηνία λήξης πρέπει να είναι μετά την ημερομηνία έκδοσης.');
+                    return;
+                }
+
+                if (valueDate < issueDate || valueDate > maturityDate) {
+                    alert('Η ημερομηνία αγοράς πρέπει να είναι μεταξύ έκδοσης και λήξης.');
+                    return;
+                }
+
+                const periodsPerYear = 12 / freqMonths;
+                const annualCoupon = fv * (cr / 100);
+                const couponPerPeriod = annualCoupon / periodsPerYear;
+                const base = getDayCountBase(convention);
+
+                const windowInfo = findCouponWindow(issueDate, maturityDate, valueDate, freqMonths);
+                const schedule = windowInfo.schedule;
+
+                let lastCoupon = windowInfo.lastCoupon;
+                let nextCoupon = windowInfo.nextCoupon;
+
+                let overrideUsed = 'NO';
+
+                if (manualOverride === 'on') {
+                    if (manualLastCoupon) {
+                        lastCoupon = manualLastCoupon;
+                        overrideUsed = 'YES';
+                    }
+                    if (manualNextCoupon) {
+                        nextCoupon = manualNextCoupon;
+                        overrideUsed = 'YES';
+                    }
+                }
+
+                if (!nextCoupon) {
+                    alert('Δεν βρέθηκε επόμενο κουπόνι μετά την ημερομηνία αγοράς.');
+                    return;
+                }
+
+                if (lastCoupon >= nextCoupon) {
+                    alert('Το Last Coupon Date πρέπει να είναι πριν από το Next Coupon Date.');
+                    return;
+                }
+
+                const futureCoupons = schedule.filter(d => d > valueDate);
+
+                let accruedDays = getDayCountDays(lastCoupon, valueDate, convention);
+                if (manualOverride === 'on' && manualAccruedDays !== null && !isNaN(manualAccruedDays)) {
+                    accruedDays = manualAccruedDays;
+                    overrideUsed = 'YES';
+                }
+
+                const fullPeriodDays = getDayCountDays(lastCoupon, nextCoupon, convention);
+                const daysToNextCoupon = getDayCountDays(valueDate, nextCoupon, convention);
+
+                if (fullPeriodDays <= 0) {
+                    alert('Σφάλμα στον υπολογισμό της πλήρους κουπονικής περιόδου.');
+                    return;
+                }
+
+                const accruedInterest = annualCoupon * accruedDays / base;
+
+                let inputAmount = 0;
+                let inputPercent = 0;
+
+                if (priceMode === 'amount') {
+                    inputAmount = inputPriceNumeric;
+                    inputPercent = amountToPercentOfPar(inputAmount, fv);
+                } else {
+                    inputPercent = inputPriceNumeric;
+                    inputAmount = percentOfParToAmount(inputPercent, fv);
+                }
+
+                let cleanPrice = 0;
+                let dirtyPrice = 0;
+
+                if (priceType === 'clean') {
+                    cleanPrice = inputAmount;
+                    dirtyPrice = cleanPrice + accruedInterest;
+                } else {
+                    dirtyPrice = inputAmount;
+                    cleanPrice = dirtyPrice - accruedInterest;
+                }
+
+                const cleanPct = amountToPercentOfPar(cleanPrice, fv);
+                const dirtyPct = amountToPercentOfPar(dirtyPrice, fv);
+
+                const firstFrac = daysToNextCoupon / fullPeriodDays;
+
+                const periodsForYTM = futureCoupons.length > 0 ? futureCoupons.length : 1;
+
+                const ytm = calcYTM(
+                    dirtyPrice,
+                    fv,
+                    couponPerPeriod,
+                    periodsForYTM,
+                    periodsPerYear,
+                    firstFrac
+                );
+
+                const totalCoupons = couponPerPeriod * futureCoupons.length;
+                const totalCashFlows = totalCoupons + fv;
+                const profitLoss = totalCashFlows - dirtyPrice;
+                const duration = diffYMD(valueDate, maturityDate);
+
+                const premDisc = classifyPremiumDiscount(cleanPrice, fv);
+
+                lastCalc = {
+                    fv,
+                    inputPriceRaw,
+                    inputPriceNumeric,
+                    priceMode,
+                    priceType,
+                    inputAmount,
+                    inputPercent,
+                    cleanPrice,
+                    cleanPct,
+                    dirtyPrice,
+                    dirtyPct,
+                    cr,
+                    issueDate,
+                    valueDate,
+                    maturityDate,
+                    freqMonths,
+                    periodsPerYear,
+                    convention,
+                    base,
+                    annualCoupon,
+                    couponPerPeriod,
+                    schedule,
+                    lastCoupon,
+                    nextCoupon,
+                    futureCoupons,
+                    accruedDays,
+                    fullPeriodDays,
+                    daysToNextCoupon,
+                    accruedInterest,
+                    ytm,
+                    totalCoupons,
+                    totalCashFlows,
+                    profitLoss,
+                    duration,
+                    firstFrac,
+                    premDisc,
+                    overrideUsed,
+                    manualOverride,
+                    manualLastCoupon,
+                    manualNextCoupon,
+                    manualAccruedDays
+                };
+
+                document.getElementById('r-ytm').textContent = ytm.toFixed(4).replace('.', ',') + '%';
+                document.getElementById('r-pricemode').textContent = priceMode === 'amount' ? 'Amount' : '% of Par';
+                document.getElementById('r-pricetype').textContent = priceType === 'clean' ? 'Clean Price Input' : 'Dirty Price Input';
+                document.getElementById('r-override-used').textContent = overrideUsed;
+                document.getElementById('r-inputprice-raw').textContent = inputPriceRaw;
+                document.getElementById('r-inputprice-amount').textContent = '€' + fmt(inputAmount);
+                document.getElementById('r-inputprice-pct').textContent = fmtPct(inputPercent);
+                document.getElementById('r-nominal').textContent = '€' + fmt(fv);
+                document.getElementById('r-clean').textContent = '€' + fmt(cleanPrice);
+                document.getElementById('r-clean-pct').textContent = fmtPct(cleanPct);
+                document.getElementById('r-acc').textContent = '€' + fmt(accruedInterest);
+                document.getElementById('r-dirty').textContent = '€' + fmt(dirtyPrice);
+                document.getElementById('r-dirty-pct').textContent = fmtPct(dirtyPct);
+                document.getElementById('r-premdisc-amt').textContent = (premDisc.diff >= 0 ? '+' : '') + '€' + fmt(premDisc.diff);
+                document.getElementById('r-premdisc-pct').textContent = (premDisc.pct >= 0 ? '+' : '') + fmtPct(premDisc.pct);
+
+                document.getElementById('r-days').textContent = accruedDays + ' ημέρες';
+                document.getElementById('r-ann').textContent = '€' + fmt(annualCoupon);
+                document.getElementById('r-cp').textContent = '€' + fmt(couponPerPeriod);
+                document.getElementById('r-conv').textContent = convention;
+                document.getElementById('r-lastc').textContent = fmtDate(lastCoupon);
+                document.getElementById('r-nextc').textContent = fmtDate(nextCoupon);
+                document.getElementById('r-fulldays').textContent = fullPeriodDays + ' ημέρες';
+                document.getElementById('r-daystonext').textContent = daysToNextCoupon + ' ημέρες';
+                document.getElementById('r-duration').textContent =
+                    duration.years + ' έτη, ' +
+                    duration.months + ' μήνες, ' +
+                    duration.days + ' ημέρες (' +
+                    duration.totalYears.toFixed(2).replace('.', ',') + ' χρόνια)';
+
+                const statusRow = document.getElementById('r-status-row');
+                statusRow.className = 'result-row';
+                if (premDisc.status === 'At Premium') statusRow.classList.add('premium');
+                if (premDisc.status === 'At Discount') statusRow.classList.add('discount');
+                if (premDisc.status === 'At Par') statusRow.classList.add('par');
+                document.getElementById('r-status').textContent = premDisc.status;
+
+                document.getElementById('r-explain-line1').textContent =
+                    'Nominal Value = €' + fmt(fv) + ' και Input Price = ' +
+                    (priceMode === 'amount' ? '€' + fmt(inputAmount) : fmtPct(inputPercent)) + '.';
+
+                document.getElementById('r-explain-line2').textContent =
+                    'Clean Price = €' + fmt(cleanPrice) + ', Accrued Interest = €' + fmt(accruedInterest) +
+                    ' → Dirty Price = €' + fmt(dirtyPrice) + '.';
+
+                document.getElementById('r-explain-line3').textContent =
+                    overrideUsed === 'YES'
+                        ? 'Έγινε χρήση manual override για να ταιριάξει με ειδικό bank/broker logic.'
+                        : 'Το Dirty Price είναι το πραγματικό ποσό πληρωμής. Αν το bond αγοράστηκε premium, τότε συνήθως Clean Price > Nominal Value.';
+
+                document.getElementById('r-tot-coup').textContent = '€' + fmt(totalCoupons);
+                document.getElementById('r-cap').textContent = '€' + fmt(fv);
+                document.getElementById('r-tot-all').textContent = '€' + fmt(totalCashFlows);
+                document.getElementById('r-dirty-cost').textContent = '€' + fmt(dirtyPrice);
+
+                const profitEl = document.getElementById('r-profit');
+                profitEl.textContent = (profitLoss >= 0 ? '+' : '') + '€' + fmt(profitLoss);
+                profitEl.style.color = profitLoss >= 0 ? '#28a745' : '#dc3545';
+
+                const tb = document.getElementById('tb');
+                tb.innerHTML = '';
+
+                let prev = valueDate;
+                futureCoupons.forEach((couponDate, index) => {
+                    const ds = getDayCountDays(prev, couponDate, convention);
+                    const isLast = index === futureCoupons.length - 1;
+                    const principal = isLast ? fv : 0;
+                    const total = couponPerPeriod + principal;
+
+                    const row = tb.insertRow();
+                    row.innerHTML =
+                        '<td>' + (index + 1) + '</td>' +
+                        '<td>' + fmtDate(couponDate) + '</td>' +
+                        '<td>' + ds + '</td>' +
+                        '<td>€' + fmt(couponPerPeriod) + '</td>' +
+                        '<td>€' + fmt(principal) + '</td>' +
+                        '<td>€' + fmt(total) + '</td>';
+
+                    prev = couponDate;
+                });
+
+                const ratePerPeriod = ytm / 100 / periodsPerYear;
+                let pv = 0;
+
+                for (let i = 0; i < periodsForYTM; i++) {
+                    const cf = (i === periodsForYTM - 1) ? couponPerPeriod + fv : couponPerPeriod;
+                    pv += cf / Math.pow(1 + ratePerPeriod, i + firstFrac);
+                }
+
+                document.getElementById('r-pv').textContent = '€' + fmt(pv);
+                document.getElementById('r-diff').textContent = '€' + fmt(Math.abs(pv - dirtyPrice));
+
+                document.getElementById('res').classList.add('show');
+                document.getElementById('res').scrollIntoView({ behavior: 'smooth' });
+
+            } catch (err) {
+                console.error(err);
+                alert('Σφάλμα: ' + err.message);
+            }
+        }
+
+        function exportTXT() {
+            if (!lastCalc) {
+                alert('Κάντε πρώτα υπολογισμό.');
+                return;
+            }
+
+            const c = lastCalc;
+            let out = '';
+
+            out += '='.repeat(108) + '\n';
+            out += 'ΑΝΑΛΥΣΗ ΟΜΟΛΟΓΟΥ - v6\n';
+            out += '='.repeat(108) + '\n\n';
+
+            out += 'ΣΤΟΙΧΕΙΑ ΟΜΟΛΟΓΟΥ\n';
+            out += '-'.repeat(108) + '\n';
+            out += 'Nominal Value:                          €' + fmt(c.fv) + '\n';
+            out += 'Input Price Raw:                        ' + c.inputPriceRaw + '\n';
+            out += 'Price Mode:                             ' + (c.priceMode === 'amount' ? 'Amount' : '% of Par') + '\n';
+            out += 'Price Type:                             ' + (c.priceType === 'clean' ? 'Clean Price Input' : 'Dirty Price Input') + '\n';
+            out += 'Input Price as Amount:                  €' + fmt(c.inputAmount) + '\n';
+            out += 'Input Price as % of Par:                ' + fmtPct(c.inputPercent) + '\n';
+            out += 'Clean Price:                            €' + fmt(c.cleanPrice) + '\n';
+            out += 'Clean Price as % of Par:                ' + fmtPct(c.cleanPct) + '\n';
+            out += 'Accrued Interest:                       €' + fmt(c.accruedInterest) + '\n';
+            out += 'Dirty Price:                            €' + fmt(c.dirtyPrice) + '\n';
+            out += 'Dirty Price as % of Par:                ' + fmtPct(c.dirtyPct) + '\n';
+            out += 'Purchase Status:                        ' + c.premDisc.status + '\n';
+            out += 'Premium/Discount Amount:                ' + (c.premDisc.diff >= 0 ? '+' : '') + '€' + fmt(c.premDisc.diff) + '\n';
+            out += 'Premium/Discount %:                     ' + (c.premDisc.pct >= 0 ? '+' : '') + fmtPct(c.premDisc.pct) + '\n';
+            out += 'Coupon Rate:                            ' + c.cr + '%\n';
+            out += 'Annual Coupon:                          €' + fmt(c.annualCoupon) + '\n';
+            out += 'Coupon per Period:                      €' + fmt(c.couponPerPeriod) + '\n';
+            out += 'Convention:                             ' + c.convention + '\n';
+            out += 'Day Count Base:                         ' + c.base + '\n';
+            out += '-'.repeat(108) + '\n';
+            out += 'Issue Date:                             ' + fmtDate(c.issueDate) + '\n';
+            out += 'Value Date:                             ' + fmtDate(c.valueDate) + '\n';
+            out += 'Maturity Date:                          ' + fmtDate(c.maturityDate) + '\n';
+            out += 'Last Coupon Date:                       ' + fmtDate(c.lastCoupon) + '\n';
+            out += 'Next Coupon Date:                       ' + fmtDate(c.nextCoupon) + '\n';
+            out += 'Accrued Days:                           ' + c.accruedDays + '\n';
+            out += 'Days to Next Coupon:                    ' + c.daysToNextCoupon + '\n';
+            out += 'Full Period Days:                       ' + c.fullPeriodDays + '\n';
+            out += 'Frequency per Year:                     ' + c.periodsPerYear + '\n';
+            out += 'YTM:                                    ' + c.ytm.toFixed(4).replace('.', ',') + '%\n';
+            out += '-'.repeat(108) + '\n\n';
+
+            out += 'MANUAL OVERRIDE\n';
+            out += '-'.repeat(108) + '\n';
+            out += 'Override Used:                          ' + c.overrideUsed + '\n';
+            out += 'Manual Override Switch:                 ' + c.manualOverride + '\n';
+            out += 'Manual Last Coupon Date:                ' + (c.manualLastCoupon ? fmtDate(c.manualLastCoupon) : '-') + '\n';
+            out += 'Manual Next Coupon Date:                ' + (c.manualNextCoupon ? fmtDate(c.manualNextCoupon) : '-') + '\n';
+            out += 'Manual Accrued Days:                    ' + (c.manualAccruedDays !== null && c.manualAccruedDays !== undefined ? c.manualAccruedDays : '-') + '\n';
+            out += '-'.repeat(108) + '\n\n';
+
+            out += 'ΕΡΜΗΝΕΙΑ\n';
+            out += '-'.repeat(108) + '\n';
+            out += 'Dirty Price = Clean Price + Accrued Interest\n';
+            out += 'Το Dirty Price είναι το πραγματικό ποσό πληρωμής.\n';
+            out += 'Η τιμή μπορεί να δοθεί είτε ως Amount είτε ως % of Par.\n';
+            out += 'Η v6 επιτρέπει manual override για matching με bank/broker statement.\n';
+            out += '-'.repeat(108) + '\n\n';
+
+            out += 'ΣΥΝΟΛΙΚΕΣ ΤΑΜΕΙΑΚΕΣ ΡΟΕΣ\n';
+            out += '-'.repeat(108) + '\n';
+            out += 'Total Coupons:                          €' + fmt(c.totalCoupons) + '\n';
+            out += 'Principal Repayment:                    €' + fmt(c.fv) + '\n';
+            out += 'Total Cash Flows:                       €' + fmt(c.totalCashFlows) + '\n';
+            out += 'Dirty Cost for YTM:                     €' + fmt(c.dirtyPrice) + '\n';
+            out += 'Profit/Loss at Maturity:                €' + fmt(c.profitLoss) + '\n';
+            out += '-'.repeat(108) + '\n\n';
+
+            out += 'ΑΝΑΛΥΤΙΚΕΣ ΤΑΜΕΙΑΚΕΣ ΡΟΕΣ\n';
+            out += '='.repeat(108) + '\n';
+            out += 'Περ.  Ημερομηνία       Ημέρες   Κουπόνι            Κεφάλαιο           Σύνολο\n';
+            out += '-'.repeat(108) + '\n';
+
+            let prev = c.valueDate;
+            c.futureCoupons.forEach((couponDate, index) => {
+                const ds = getDayCountDays(prev, couponDate, c.convention);
+                const isLast = index === c.futureCoupons.length - 1;
+                const principal = isLast ? c.fv : 0;
+                const total = c.couponPerPeriod + principal;
+
+                out += (index + 1).toString().padEnd(6) +
+                       fmtDate(couponDate).padEnd(17) +
+                       String(ds).padEnd(9) +
+                       ('€' + fmt(c.couponPerPeriod)).padEnd(19) +
+                       ('€' + fmt(principal)).padEnd(20) +
+                       ('€' + fmt(total)) + '\n';
+
+                prev = couponDate;
+            });
+
+            out += '='.repeat(108) + '\n';
+
+            const blob = new Blob([out], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'bond_v6_' + fmtDate(new Date()).replace(/\//g, '-') + '.txt';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        const today = new Date();
+        document.getElementById('id').valueAsDate = today;
+        document.getElementById('vd').valueAsDate = today;
+
+        const future = new Date(today);
+        future.setFullYear(future.getFullYear() + 5);
+        document.getElementById('md').valueAsDate = future;
+    </script>
+</body>
+</html>
